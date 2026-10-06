@@ -4,9 +4,7 @@ import {
   PlusCircle,
   MessageSquare,
   Send,
-  CheckCircle2,
   Clock,
-  Paperclip,
   ArrowRight,
   ShieldCheck,
 } from 'lucide-react';
@@ -20,7 +18,7 @@ import { Modal } from '../../ui/Modal';
 import { Drawer } from '../../ui/Drawer';
 import { Input, Textarea } from '../../ui/Input';
 import { EmptyState } from '../../shared/EmptyState';
-import { formatDateTime, formatTimeAgo } from '../../../lib/utils';
+import { formatTimeAgo } from '../../../lib/utils';
 
 export const SupportPage: React.FC = () => {
   const { currentTenant } = useTenant();
@@ -81,10 +79,10 @@ export const SupportPage: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-border">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">Support Desk</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Support Desk</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Direct communication channel with LevelUp engineers and system architects.
           </p>
         </div>
@@ -92,24 +90,24 @@ export const SupportPage: React.FC = () => {
           variant="primary"
           size="sm"
           onClick={() => setIsNewTicketOpen(true)}
-          icon={<PlusCircle className="w-3.5 h-3.5" />}
+          icon={<PlusCircle className="size-3.5" />}
         >
           Open Ticket
         </Button>
       </div>
 
       {/* Support SLA Banner */}
-      <div className="p-3.5 rounded-lg border border-zinc-800 bg-[#0b0c10] flex items-center justify-between text-xs text-zinc-300">
+      <div className="p-3.5 rounded-lg border border-border bg-card flex items-center justify-between text-xs text-foreground">
         <div className="flex items-center gap-2.5">
-          <ShieldCheck className="w-4 h-4 text-violet-400 shrink-0" />
+          <ShieldCheck className="size-4 text-emerald-500 shrink-0" />
           <div>
-            <span className="font-semibold text-white">Care Plan SLA</span>
-            <span className="text-zinc-400 ml-2">
+            <span className="font-semibold text-foreground">Care Plan SLA</span>
+            <span className="text-muted-foreground ml-2">
               Assigned directly to on-call LevelUp engineering pods.
             </span>
           </div>
         </div>
-        <div className="font-mono text-emerald-400 font-semibold text-[11px] hidden md:block">
+        <div className="font-mono text-emerald-500 font-semibold text-[11px] hidden md:block">
           Target SLA &lt; 12h
         </div>
       </div>
@@ -117,32 +115,32 @@ export const SupportPage: React.FC = () => {
       {/* Tickets List */}
       {tickets.length === 0 ? (
         <EmptyState
-          icon={<LifeBuoy className="w-6 h-6 text-violet-400" />}
+          icon={<LifeBuoy className="size-6 text-foreground" />}
           title="No open tickets"
           description="Everything operational. Open a ticket if you need technical support."
           actionLabel="Open a Ticket"
           onAction={() => setIsNewTicketOpen(true)}
         />
       ) : (
-        <div className="bg-[#0b0c10] border border-zinc-800 rounded-lg overflow-hidden shadow-xs divide-y divide-zinc-800/60">
+        <div className="bg-card border border-border rounded-lg overflow-hidden shadow-xs divide-y divide-border/60">
           {tickets.map((t) => (
             <div
               key={t.id}
               onClick={() => setSelectedTicket(t)}
-              className="p-3.5 sm:p-4 hover:bg-[#111218] transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+              className="p-3.5 sm:p-4 hover:bg-accent/40 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
             >
               <div className="space-y-1 flex-1 min-w-0 pr-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-white group-hover:text-violet-300 transition-colors">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                     {t.subject}
                   </span>
                   <StatusBadge status={t.status} />
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase">
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase">
                     {t.category}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-mono">
+                <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono">
                   <span>#{t.id}</span>
                   <span>·</span>
                   <span>Updated {formatTimeAgo(t.updated_at)}</span>
@@ -151,9 +149,9 @@ export const SupportPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-zinc-400 shrink-0 self-end sm:self-center">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0 self-end sm:self-center">
                 <span className="text-[11px] font-mono hidden sm:inline">Thread</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform text-zinc-400" />
+                <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform text-muted-foreground" />
               </div>
             </div>
           ))}
@@ -179,11 +177,11 @@ export const SupportPage: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1">Category</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Category</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-[#12131a] border border-zinc-800 rounded-md px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-600 min-h-[38px]"
+                className="w-full bg-card border border-border rounded-md px-3 py-2 text-xs text-foreground focus:outline-none focus:border-border min-h-[38px]"
               >
                 <option value="Technical Issue">Technical Issue</option>
                 <option value="DNS & Domain">DNS & Domain</option>
@@ -194,11 +192,11 @@ export const SupportPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1">Priority</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Priority</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as RequestPriority)}
-                className="w-full bg-[#12131a] border border-zinc-800 rounded-md px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-600 min-h-[38px]"
+                className="w-full bg-card border border-border rounded-md px-3 py-2 text-xs text-foreground focus:outline-none focus:border-border min-h-[38px]"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -217,7 +215,7 @@ export const SupportPage: React.FC = () => {
             required
           />
 
-          <div className="flex justify-end gap-2.5 pt-3 border-t border-zinc-800">
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-border">
             <Button
               type="button"
               variant="ghost"
@@ -243,15 +241,15 @@ export const SupportPage: React.FC = () => {
           width="lg"
         >
           <div className="space-y-5">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-[#0e0f14] border border-zinc-800">
-              <div className="text-xs text-zinc-300 font-mono">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border">
+              <div className="text-xs text-foreground font-mono">
                 Category: <strong>{selectedTicket.category}</strong>
               </div>
               <StatusBadge status={selectedTicket.status} />
             </div>
 
             <div className="space-y-3">
-              <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider font-mono">
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider font-mono">
                 Conversation History
               </h3>
 
@@ -259,30 +257,26 @@ export const SupportPage: React.FC = () => {
                 {selectedTicket.messages.map((m) => (
                   <div
                     key={m.id}
-                    className={`p-3 rounded-lg border text-xs leading-relaxed ${
-                      m.sender_role === 'admin'
-                        ? 'bg-[#10121a] border-violet-800/40 text-zinc-200'
-                        : 'bg-[#0c0d12] border-zinc-800 text-zinc-300'
-                    }`}
+                    className="p-3 rounded-lg border border-border bg-card text-xs leading-relaxed"
                   >
-                    <div className="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-zinc-800/60">
+                    <div className="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-border/60">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white">{m.sender_name}</span>
+                        <span className="font-semibold text-foreground">{m.sender_name}</span>
                         <span
-                          className={`px-1.5 py-0.2 text-[9px] font-mono rounded ${
+                          className={`px-1.5 py-0.5 text-[9px] font-mono rounded ${
                             m.sender_role === 'admin'
-                              ? 'bg-violet-950 text-violet-300'
-                              : 'bg-zinc-800 text-zinc-400'
+                              ? 'bg-primary text-primary-foreground font-semibold'
+                              : 'bg-muted text-muted-foreground'
                           }`}
                         >
                           {m.sender_role === 'admin' ? 'Staff' : 'Client'}
                         </span>
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-mono">
+                      <span className="text-[10px] text-muted-foreground font-mono">
                         {formatTimeAgo(m.created_at)}
                       </span>
                     </div>
-                    <p>{m.message}</p>
+                    <p className="text-foreground">{m.message}</p>
                   </div>
                 ))}
               </div>
@@ -300,7 +294,7 @@ export const SupportPage: React.FC = () => {
                     type="submit"
                     variant="primary"
                     size="sm"
-                    icon={<Send className="w-3.5 h-3.5" />}
+                    icon={<Send className="size-3.5" />}
                     disabled={!replyText.trim()}
                   >
                     Send Reply

@@ -51,23 +51,23 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Dialog (Vercel clean dialog) */}
       <div
         className={cn(
-          'relative w-full bg-[#0c0d12] border border-zinc-800 rounded-lg shadow-2xl p-4 sm:p-5 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto',
+          'relative w-full bg-card border border-border rounded-lg shadow-2xl p-4 sm:p-5 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto',
           maxWidthStyles[maxWidth]
         )}
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-start justify-between gap-3 pb-3 border-b border-zinc-800">
+        <div className="flex items-start justify-between gap-3 pb-3 border-b border-border">
           <div>
-            <h3 className="text-sm sm:text-base font-semibold text-white tracking-tight">{title}</h3>
-            {description && <p className="text-xs text-zinc-400 mt-0.5">{description}</p>}
+            <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-tight">{title}</h3>
+            {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-zinc-400 hover:text-white hover:bg-zinc-800/60 min-h-[32px] min-w-[32px] flex items-center justify-center"
+            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-accent/60 size-8 flex items-center justify-center"
             aria-label="Close dialog"
           >
-            <X className="w-4 h-4" />
+            <X className="size-4" />
           </button>
         </div>
 

@@ -50,25 +50,25 @@ export const Drawer: React.FC<DrawerProps> = ({
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-0 sm:pl-10">
         <div
           className={cn(
-            'w-screen bg-[#0b0c10] border-l border-zinc-800 shadow-2xl flex flex-col animate-in slide-in-from-right duration-200',
+            'w-screen bg-card border-l border-border shadow-2xl flex flex-col animate-in slide-in-from-right duration-200',
             widthStyles[width]
           )}
         >
           {/* Mobile Drag Handle affordance */}
-          <div className="sm:hidden w-8 h-1 bg-zinc-800 rounded-full mx-auto my-2" />
+          <div className="sm:hidden w-8 h-1 bg-muted rounded-full mx-auto my-2" />
 
           {/* Header */}
-          <div className="px-4 sm:px-6 py-3 sm:py-3.5 border-b border-zinc-800 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 sm:py-3.5 border-b border-border flex items-center justify-between gap-3">
             <div className="pr-2 min-w-0">
-              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight truncate">{title}</h2>
-              {subtitle && <p className="text-[11px] text-zinc-400 mt-0.5 truncate font-mono">{subtitle}</p>}
+              <h2 className="text-sm sm:text-base font-semibold text-foreground tracking-tight truncate">{title}</h2>
+              {subtitle && <p className="text-[11px] text-muted-foreground mt-0.5 truncate font-mono">{subtitle}</p>}
             </div>
             <button
               onClick={onClose}
-              className="p-1 rounded text-zinc-400 hover:text-white hover:bg-zinc-800/60 transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center shrink-0"
+              className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors size-8 flex items-center justify-center shrink-0"
               aria-label="Close panel"
             >
-              <X className="w-4 h-4" />
+              <X className="size-4" />
             </button>
           </div>
 

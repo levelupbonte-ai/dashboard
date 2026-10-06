@@ -130,39 +130,39 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Website Requests</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">Website Requests</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Submit modifications, copy revisions, and design tickets tracked under your Care Plan SLA.
           </p>
         </div>
 
         {/* View mode toggle (Kiranism Kanban vs Table) + Action button */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center p-0.5 rounded-lg border border-zinc-800 bg-[#0c0d12]">
+          <div className="flex items-center p-0.5 rounded-lg border border-border bg-card">
             <button
               onClick={() => setViewMode('table')}
               className={`p-1.5 rounded-md text-xs font-mono transition-colors flex items-center gap-1.5 ${
                 viewMode === 'table'
-                  ? 'bg-zinc-800 text-white font-semibold'
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
               title="Table View"
             >
-              <TableIcon className="w-3.5 h-3.5" />
+              <TableIcon className="size-3.5" />
               <span className="hidden sm:inline">Table</span>
             </button>
             <button
               onClick={() => setViewMode('kanban')}
               className={`p-1.5 rounded-md text-xs font-mono transition-colors flex items-center gap-1.5 ${
                 viewMode === 'kanban'
-                  ? 'bg-zinc-800 text-white font-semibold'
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
               title="Kanban Board View"
             >
-              <Kanban className="w-3.5 h-3.5" />
+              <Kanban className="size-3.5" />
               <span className="hidden sm:inline">Kanban</span>
             </button>
           </div>
@@ -171,7 +171,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
             variant="primary"
             size="sm"
             onClick={() => setIsCreateModalOpen(true)}
-            icon={<PlusCircle className="w-3.5 h-3.5" />}
+            icon={<PlusCircle className="size-3.5" />}
           >
             Request Change
           </Button>
@@ -200,8 +200,8 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                 onClick={() => setStatusFilter(tab.id)}
                 className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap min-h-[34px] ${
                   isActive
-                    ? 'bg-zinc-800 text-white font-semibold'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-accent text-accent-foreground font-semibold shadow-2xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {tab.label}
@@ -212,13 +212,13 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
         </div>
 
         <div className="relative min-w-[200px] sm:min-w-[240px]">
-          <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5" />
+          <Search className="size-3.5 text-muted-foreground absolute left-3 top-2.5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Filter requests..."
-            className="w-full bg-[#0f1016] border border-zinc-800 rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-600 min-h-[34px]"
+            className="w-full bg-card border border-border rounded-md pl-8 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border min-h-[34px]"
           />
         </div>
       </div>
@@ -231,12 +231,12 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
             return (
               <div
                 key={col.id}
-                className="bg-[#0b0c10] border border-zinc-800/80 rounded-lg p-3 min-h-[360px] flex flex-col space-y-2.5 shadow-xs"
+                className="bg-card border border-border rounded-lg p-3 min-h-[360px] flex flex-col space-y-2.5 shadow-xs"
               >
                 {/* Column Header */}
-                <div className="flex items-center justify-between pb-2 border-b border-zinc-800 text-xs font-mono font-medium text-zinc-300">
+                <div className="flex items-center justify-between pb-2 border-b border-border text-xs font-mono font-medium text-foreground">
                   <span className="truncate">{col.label}</span>
-                  <span className="px-1.5 py-0.2 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400">
+                  <span className="px-1.5 py-0.5 rounded bg-muted border border-border text-[10px] text-muted-foreground">
                     {colRequests.length}
                   </span>
                 </div>
@@ -244,7 +244,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                 {/* Column Cards */}
                 <div className="space-y-2 flex-1">
                   {colRequests.length === 0 ? (
-                    <div className="py-8 text-center text-[11px] font-mono text-zinc-600 border border-dashed border-zinc-800/60 rounded-md">
+                    <div className="py-8 text-center text-[11px] font-mono text-muted-foreground border border-dashed border-border/80 rounded-md">
                       Empty
                     </div>
                   ) : (
@@ -252,33 +252,33 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                       <div
                         key={req.id}
                         onClick={() => setSelectedRequest(req)}
-                        className="bg-[#101118] border border-zinc-800 hover:border-zinc-700 p-3 rounded-md transition-all cursor-pointer space-y-2 shadow-xs group"
+                        className="bg-muted/40 border border-border hover:border-border/80 p-3 rounded-md transition-all cursor-pointer space-y-2 shadow-xs group"
                       >
                         <div className="flex items-start justify-between gap-1.5">
-                          <h4 className="text-xs font-semibold text-white group-hover:text-violet-300 transition-colors line-clamp-2 leading-snug">
+                          <h4 className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                             {req.title}
                           </h4>
                           <span
                             className={`text-[9px] font-mono uppercase font-bold px-1 rounded ${
                               req.priority === 'urgent'
-                                ? 'text-rose-400 bg-rose-950/40'
+                                ? 'text-destructive bg-destructive/10'
                                 : req.priority === 'high'
-                                ? 'text-amber-400 bg-amber-950/40'
-                                : 'text-zinc-400 bg-zinc-900'
+                                ? 'text-amber-500 bg-amber-500/10'
+                                : 'text-muted-foreground bg-muted'
                             }`}
                           >
                             {req.priority}
                           </span>
                         </div>
 
-                        <p className="text-[11px] text-zinc-400 line-clamp-2 leading-relaxed">
+                        <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
                           {req.description}
                         </p>
 
-                        <div className="pt-1.5 border-t border-zinc-800/60 flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+                        <div className="pt-1.5 border-t border-border/60 flex items-center justify-between text-[10px] text-muted-foreground font-mono">
                           <span className="truncate max-w-[100px]">{req.website_name}</span>
                           <span className="inline-flex items-center gap-1">
-                            <MessageSquare className="w-2.5 h-2.5" />
+                            <MessageSquare className="size-2.5" />
                             {req.messages.length}
                           </span>
                         </div>
@@ -297,54 +297,54 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
         <>
           {filteredRequests.length === 0 ? (
             <EmptyState
-              icon={<FileCode2 className="w-6 h-6 text-violet-400" />}
+              icon={<FileCode2 className="size-6 text-foreground" />}
               title="No requests found"
               description="You have no change requests under this filter."
               actionLabel="Request a Change"
               onAction={() => setIsCreateModalOpen(true)}
             />
           ) : (
-            <div className="bg-[#0b0c10] border border-zinc-800 rounded-lg overflow-hidden shadow-xs divide-y divide-zinc-800/60">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-xs divide-y divide-border/80">
               {filteredRequests.map((req) => (
                 <div
                   key={req.id}
                   onClick={() => setSelectedRequest(req)}
-                  className="p-3.5 sm:p-4 hover:bg-[#111218] transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-3 group"
+                  className="p-3.5 sm:p-4 hover:bg-accent/50 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-3 group"
                 >
                   <div className="space-y-1 flex-1 min-w-0 pr-2">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-semibold text-white group-hover:text-violet-300 transition-colors">
+                      <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                         {req.title}
                       </span>
                       <StatusBadge status={req.status} />
-                      <span className="px-1.5 py-0.2 text-[10px] font-mono uppercase bg-zinc-900 border border-zinc-800 text-zinc-400 rounded">
+                      <span className="px-1.5 py-0.2 text-[10px] font-mono uppercase bg-muted border border-border text-muted-foreground rounded">
                         {req.category.replace('_', ' ')}
                       </span>
                       <span
                         className={`text-[10px] font-mono uppercase font-semibold ${
                           req.priority === 'urgent'
-                            ? 'text-rose-400'
+                            ? 'text-destructive'
                             : req.priority === 'high'
-                            ? 'text-amber-400'
-                            : 'text-zinc-400'
+                            ? 'text-amber-500'
+                            : 'text-muted-foreground'
                         }`}
                       >
                         {req.priority}
                       </span>
                     </div>
 
-                    <p className="text-xs text-zinc-400 line-clamp-1 leading-relaxed">
+                    <p className="text-xs text-muted-foreground line-clamp-1 leading-relaxed">
                       {req.description}
                     </p>
 
-                    <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-mono">
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono">
                       <span>{req.website_name}</span>
                       <span>·</span>
                       <span>Created {formatTimeAgo(req.created_at)}</span>
                       {req.messages.length > 0 && (
                         <>
                           <span>·</span>
-                          <span className="inline-flex items-center gap-1 text-zinc-300">
+                          <span className="inline-flex items-center gap-1 text-foreground">
                             <MessageSquare className="w-3 h-3" />
                             {req.messages.length}
                           </span>
@@ -353,9 +353,9 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xs text-zinc-400 shrink-0 self-end md:self-center font-mono text-[11px]">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0 self-end md:self-center font-mono text-[11px]">
                     <span className="hidden sm:inline">Details</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform text-zinc-400" />
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform text-muted-foreground" />
                   </div>
                 </div>
               ))}
@@ -383,11 +383,11 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1">Target Website</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Target Website</label>
               <select
                 value={newWebsiteId}
                 onChange={(e) => setNewWebsiteId(e.target.value)}
-                className="w-full bg-[#12131a] border border-zinc-800 rounded-md px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-600 min-h-[38px]"
+                className="w-full bg-card border border-border rounded-md px-3 py-2 text-xs text-foreground focus:outline-none focus:border-border min-h-[38px]"
               >
                 {websites.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -398,11 +398,11 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1">Category</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Category</label>
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value as RequestCategory)}
-                className="w-full bg-[#12131a] border border-zinc-800 rounded-md px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-600 min-h-[38px]"
+                className="w-full bg-card border border-border rounded-md px-3 py-2 text-xs text-foreground focus:outline-none focus:border-border min-h-[38px]"
               >
                 <option value="content">Content & Text Update</option>
                 <option value="new_section">New Website Section</option>
@@ -417,7 +417,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1">Priority</label>
+            <label className="block text-xs font-medium text-foreground mb-1">Priority</label>
             <div className="grid grid-cols-4 gap-2">
               {(['low', 'medium', 'high', 'urgent'] as RequestPriority[]).map((p) => (
                 <button
@@ -426,8 +426,8 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                   onClick={() => setNewPriority(p)}
                   className={`py-1.5 text-xs font-mono uppercase rounded-md border text-center transition-colors min-h-[36px] ${
                     newPriority === p
-                      ? 'bg-zinc-800 text-white border-zinc-600 font-semibold'
-                      : 'border-zinc-800 text-zinc-400 hover:bg-zinc-900/60'
+                      ? 'bg-accent text-accent-foreground border-border font-semibold shadow-2xs'
+                      : 'border-border text-muted-foreground hover:bg-accent/40 hover:text-foreground'
                   }`}
                 >
                   {p}
@@ -445,7 +445,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
             required
           />
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-zinc-800">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
             <Button
               type="button"
               variant="ghost"
@@ -471,26 +471,26 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
           width="xl"
         >
           <div className="space-y-5">
-            <div className="p-3.5 rounded-lg bg-[#0e0f14] border border-zinc-800 flex items-center justify-between gap-4">
+            <div className="p-3.5 rounded-lg bg-card border border-border flex items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <div className="text-[10px] uppercase font-mono text-zinc-400">Current Status</div>
+                <div className="text-[10px] uppercase font-mono text-muted-foreground">Current Status</div>
                 <StatusBadge status={selectedRequest.status} />
               </div>
 
               <div className="space-y-0.5 text-right">
-                <div className="text-[10px] uppercase font-mono text-zinc-400">Priority</div>
-                <div className="text-xs font-mono uppercase font-bold text-violet-300">
+                <div className="text-[10px] uppercase font-mono text-muted-foreground">Priority</div>
+                <div className="text-xs font-mono uppercase font-bold text-foreground">
                   {selectedRequest.priority}
                 </div>
               </div>
 
               {isAdmin && (
                 <div className="space-y-0.5">
-                  <div className="text-[10px] uppercase font-mono text-violet-400 font-bold">Admin Status</div>
+                  <div className="text-[10px] uppercase font-mono text-foreground font-bold">Admin Status</div>
                   <select
                     value={selectedRequest.status}
                     onChange={(e) => handleStatusChange(e.target.value as RequestStatus)}
-                    className="bg-[#0b0c10] text-xs text-white border border-zinc-700 rounded px-2 py-1 font-mono"
+                    className="bg-card text-xs text-foreground border border-border rounded px-2 py-1 font-mono"
                   >
                     <option value="submitted">Submitted</option>
                     <option value="in_review">In Review</option>
@@ -503,25 +503,25 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
             </div>
 
             <div className="space-y-1.5">
-              <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider font-mono">
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider font-mono">
                 Specifications
               </h3>
-              <div className="p-3.5 rounded-lg bg-[#0c0d12] border border-zinc-800 text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap font-sans">
+              <div className="p-3.5 rounded-lg bg-card border border-border text-xs text-foreground leading-relaxed whitespace-pre-wrap font-sans">
                 {selectedRequest.description}
               </div>
-              <div className="text-[10px] text-zinc-400 font-mono">
+              <div className="text-[10px] text-muted-foreground font-mono">
                 Submitted on {formatDateTime(selectedRequest.created_at)}
               </div>
             </div>
 
-            <div className="space-y-3 pt-3.5 border-t border-zinc-800">
-              <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-violet-400" />
+            <div className="space-y-3 pt-3.5 border-t border-border">
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider font-mono flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-foreground" />
                 Discussion & Staging Updates ({selectedRequest.messages.length})
               </h3>
 
               {selectedRequest.messages.length === 0 ? (
-                <div className="p-5 text-center text-xs text-zinc-400 border border-zinc-800 rounded-lg font-mono">
+                <div className="p-5 text-center text-xs text-muted-foreground border border-border rounded-lg font-mono">
                   No replies yet. Staging URLs and feedback will appear here.
                 </div>
               ) : (
@@ -531,24 +531,24 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                       key={msg.id}
                       className={`p-3 rounded-lg border text-xs leading-relaxed ${
                         msg.sender_role === 'admin' || msg.sender_role === 'super_admin'
-                          ? 'bg-[#10121a] border-violet-800/40 text-zinc-200'
-                          : 'bg-[#0c0d12] border-zinc-800 text-zinc-300'
+                          ? 'bg-muted/60 border-border text-foreground'
+                          : 'bg-card border-border text-foreground'
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-zinc-800/60">
+                      <div className="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-border/60">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white">{msg.sender_name}</span>
+                          <span className="font-semibold text-foreground">{msg.sender_name}</span>
                           <span
                             className={`px-1.5 py-0.2 text-[9px] font-mono rounded ${
                               msg.sender_role === 'admin'
-                                ? 'bg-violet-950 text-violet-300 border border-violet-800/40'
-                                : 'bg-zinc-800 text-zinc-400'
+                                ? 'bg-primary text-primary-foreground font-bold'
+                                : 'bg-muted text-muted-foreground border border-border'
                             }`}
                           >
                             {msg.sender_role === 'admin' ? 'Staff' : 'Client'}
                           </span>
                         </div>
-                        <span className="text-[10px] text-zinc-400 font-mono">
+                        <span className="text-[10px] text-muted-foreground font-mono">
                           {formatTimeAgo(msg.created_at)}
                         </span>
                       </div>

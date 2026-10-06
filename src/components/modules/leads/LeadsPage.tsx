@@ -111,10 +111,10 @@ export const LeadsPage: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-border">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">Leads & Inquiries</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Leads & Inquiries</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Real-time pipeline captures from contact forms and quote calculators.
           </p>
         </div>
@@ -122,7 +122,7 @@ export const LeadsPage: React.FC = () => {
           variant="primary"
           size="sm"
           onClick={() => setIsAddLeadModalOpen(true)}
-          icon={<PlusCircle className="w-3.5 h-3.5" />}
+          icon={<PlusCircle className="size-3.5" />}
         >
           Add Lead Manually
         </Button>
@@ -131,7 +131,7 @@ export const LeadsPage: React.FC = () => {
       {/* Filter and Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Status filters */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none border-b border-zinc-800/80 md:border-none">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none border-b border-border/80 md:border-none">
           {statuses.map((tab) => {
             const isActive = statusFilter === tab.id;
             const count =
@@ -142,8 +142,8 @@ export const LeadsPage: React.FC = () => {
                 onClick={() => setStatusFilter(tab.id)}
                 className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap min-h-[36px] ${
                   isActive
-                    ? 'bg-zinc-800 text-white font-semibold'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
+                    ? 'bg-accent text-accent-foreground font-semibold shadow-2xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/40'
                 }`}
               >
                 {tab.label}
@@ -155,13 +155,13 @@ export const LeadsPage: React.FC = () => {
 
         {/* Search */}
         <div className="relative min-w-[200px] sm:min-w-[240px]">
-          <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5" />
+          <Search className="size-3.5 text-muted-foreground absolute left-3 top-2.5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search leads..."
-            className="w-full bg-[#0f1015] border border-zinc-800 rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-600 min-h-[36px]"
+            className="w-full bg-card border border-border rounded-md pl-8 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border min-h-[36px]"
           />
         </div>
       </div>
@@ -169,33 +169,33 @@ export const LeadsPage: React.FC = () => {
       {/* Leads Container (Card list on mobile, Table on tablet/desktop) */}
       {filteredLeads.length === 0 ? (
         <EmptyState
-          icon={<Users2 className="w-6 h-6 text-violet-400" />}
+          icon={<Users2 className="size-6 text-foreground" />}
           title="No leads found"
           description="Inbound leads submitted on your websites will appear here."
           actionLabel="Add Lead"
           onAction={() => setIsAddLeadModalOpen(true)}
         />
       ) : (
-        <div className="bg-[#0b0c10] border border-zinc-800 rounded-lg overflow-hidden shadow-xs">
+        <div className="bg-card border border-border rounded-lg overflow-hidden shadow-xs">
           {/* Mobile Card List */}
-          <div className="sm:hidden divide-y divide-zinc-800/60">
+          <div className="sm:hidden divide-y divide-border/60">
             {filteredLeads.map((lead) => (
               <div
                 key={lead.id}
                 onClick={() => handleOpenLead(lead)}
-                className="p-3.5 hover:bg-zinc-900/40 transition-colors cursor-pointer"
+                className="p-3.5 hover:bg-accent/40 transition-colors cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <div className="text-xs font-semibold text-white">{lead.name}</div>
-                    <div className="text-[11px] text-zinc-400 font-mono">{lead.email}</div>
+                    <div className="text-xs font-semibold text-foreground">{lead.name}</div>
+                    <div className="text-[11px] text-muted-foreground font-mono">{lead.email}</div>
                   </div>
                   <StatusBadge status={lead.status} />
                 </div>
 
-                <div className="mt-2 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+                <div className="mt-2 flex items-center justify-between text-[11px] font-mono text-muted-foreground">
                   <span className="truncate max-w-[170px]">{lead.source}</span>
-                  <span className="text-emerald-400 font-medium">
+                  <span className="text-emerald-500 font-medium">
                     {lead.value ? formatCurrency(lead.value) : '—'}
                   </span>
                 </div>
@@ -207,7 +207,7 @@ export const LeadsPage: React.FC = () => {
           <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-zinc-800 bg-[#0e0f14] text-zinc-400 font-mono uppercase text-[10px]">
+                <tr className="border-b border-border bg-muted/50 text-muted-foreground font-mono uppercase text-[10px]">
                   <th className="py-2.5 px-3.5 font-medium">Name</th>
                   <th className="py-2.5 px-3.5 font-medium">Contact</th>
                   <th className="py-2.5 px-3.5 font-medium">Source / Site</th>
@@ -217,38 +217,38 @@ export const LeadsPage: React.FC = () => {
                   <th className="py-2.5 px-3.5 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/40">
+              <tbody className="divide-y divide-border/40">
                 {filteredLeads.map((lead) => (
                   <tr
                     key={lead.id}
                     onClick={() => handleOpenLead(lead)}
-                    className="hover:bg-zinc-900/30 transition-colors cursor-pointer group"
+                    className="hover:bg-accent/40 transition-colors cursor-pointer group"
                   >
                     <td className="py-3 px-3.5">
-                      <div className="font-semibold text-white group-hover:text-violet-300 transition-colors">
+                      <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
                         {lead.name}
                       </div>
                     </td>
                     <td className="py-3 px-3.5">
-                      <div className="text-zinc-300 font-mono">{lead.email}</div>
+                      <div className="text-foreground font-mono">{lead.email}</div>
                       {lead.phone && (
-                        <div className="text-[10px] text-zinc-400 font-mono">{lead.phone}</div>
+                        <div className="text-[10px] text-muted-foreground font-mono">{lead.phone}</div>
                       )}
                     </td>
                     <td className="py-3 px-3.5">
-                      <div className="text-zinc-300">{lead.source}</div>
-                      <div className="text-[10px] text-zinc-400 font-mono">{lead.website_name}</div>
+                      <div className="text-foreground">{lead.source}</div>
+                      <div className="text-[10px] text-muted-foreground font-mono">{lead.website_name}</div>
                     </td>
-                    <td className="py-3 px-3.5 font-mono tabular-nums text-emerald-400 font-semibold">
+                    <td className="py-3 px-3.5 font-mono tabular-nums text-emerald-500 font-semibold">
                       {lead.value ? formatCurrency(lead.value) : '—'}
                     </td>
-                    <td className="py-3 px-3.5 text-zinc-400 font-mono text-[11px]">
+                    <td className="py-3 px-3.5 text-muted-foreground font-mono text-[11px]">
                       {formatDateTime(lead.created_at)}
                     </td>
                     <td className="py-3 px-3.5">
                       <StatusBadge status={lead.status} />
                     </td>
-                    <td className="py-3 px-3.5 text-right font-mono text-[11px] text-zinc-400 group-hover:text-white">
+                    <td className="py-3 px-3.5 text-right font-mono text-[11px] text-muted-foreground group-hover:text-foreground">
                       Inspect &rarr;
                     </td>
                   </tr>

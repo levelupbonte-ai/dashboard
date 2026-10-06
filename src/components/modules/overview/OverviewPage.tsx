@@ -49,18 +49,18 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       {/* 1. Page Header (Kiranism Dashboard Header) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Dashboard
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-0.5">
-            Real-time digital performance for <span className="text-zinc-200 font-semibold">{currentTenant.name}</span>.
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Real-time digital performance for <span className="text-foreground font-semibold">{currentTenant.name}</span>.
           </p>
         </div>
 
         {/* Action Controls (Date picker + Request Change) */}
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md border border-zinc-800 bg-[#0c0d12] text-xs font-mono text-zinc-300">
-            <Calendar className="w-3.5 h-3.5 text-zinc-400" />
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-card text-xs font-mono text-muted-foreground">
+            <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
             <span>Oct 01, 2026 - Oct 07, 2026</span>
           </div>
 
@@ -90,7 +90,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               href={site.preview_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 font-mono"
+              className="hidden md:inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-mono"
             >
               <Globe className="w-3.5 h-3.5" />
               <span>{site.domain}</span>
@@ -105,16 +105,16 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
             {/* Card 1: Revenue / Pipeline */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-medium text-zinc-400 uppercase tracking-wider font-mono">
+                <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider font-mono">
                   {hasEcommerce ? 'Total Revenue' : 'Pipeline Value'}
                 </CardTitle>
-                <DollarSign className="w-4 h-4 text-zinc-400" />
+                <DollarSign className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold font-mono tracking-tight text-white tabular-nums">
+                <div className="text-2xl font-bold font-mono tracking-tight text-foreground tabular-nums">
                   {hasEcommerce ? '$38,450.00' : '$19,450.00'}
                 </div>
-                <p className="text-[11px] text-emerald-400 font-mono mt-1 flex items-center gap-1">
+                <p className="text-[11px] text-emerald-500 font-mono mt-1 flex items-center gap-1">
                   <ArrowUpRight className="w-3 h-3" />
                   <span>+20.1% from last month</span>
                 </p>
@@ -124,16 +124,16 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
             {/* Card 2: Inbound Leads */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-medium text-zinc-400 uppercase tracking-wider font-mono">
+                <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider font-mono">
                   Inbound Leads
                 </CardTitle>
-                <Users2 className="w-4 h-4 text-zinc-400" />
+                <Users2 className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold font-mono tracking-tight text-white tabular-nums">
+                <div className="text-2xl font-bold font-mono tracking-tight text-foreground tabular-nums">
                   +{leads.length}
                 </div>
-                <p className="text-[11px] text-emerald-400 font-mono mt-1 flex items-center gap-1">
+                <p className="text-[11px] text-emerald-500 font-mono mt-1 flex items-center gap-1">
                   <ArrowUpRight className="w-3 h-3" />
                   <span>+180.1% from last month</span>
                 </p>
@@ -143,24 +143,24 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
             {/* Card 3: Bookings / Sales */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-medium text-zinc-400 uppercase tracking-wider font-mono">
+                <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider font-mono">
                   {hasBookings ? 'Booked Services' : hasEcommerce ? 'Store Sales' : 'Monthly Traffic'}
                 </CardTitle>
                 {hasBookings ? (
-                  <CalendarCheck className="w-4 h-4 text-zinc-400" />
+                  <CalendarCheck className="w-4 h-4 text-muted-foreground" />
                 ) : (
-                  <Activity className="w-4 h-4 text-zinc-400" />
+                  <Activity className="w-4 h-4 text-muted-foreground" />
                 )}
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold font-mono tracking-tight text-white tabular-nums">
+                <div className="text-2xl font-bold font-mono tracking-tight text-foreground tabular-nums">
                   {hasBookings
                     ? `+${bookings.length}`
                     : hasEcommerce
                     ? `+${storeOrders.length}`
                     : `+${formatCompactNumber(totalVisitors)}`}
                 </div>
-                <p className="text-[11px] text-emerald-400 font-mono mt-1 flex items-center gap-1">
+                <p className="text-[11px] text-emerald-500 font-mono mt-1 flex items-center gap-1">
                   <ArrowUpRight className="w-3 h-3" />
                   <span>+19% from last month</span>
                 </p>
@@ -170,17 +170,17 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
             {/* Card 4: Core Web Vitals & Uptime */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-medium text-zinc-400 uppercase tracking-wider font-mono">
+                <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider font-mono">
                   Vitals & Uptime
                 </CardTitle>
-                <Activity className="w-4 h-4 text-zinc-400" />
+                <Activity className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold font-mono tracking-tight text-white tabular-nums">
+                <div className="text-2xl font-bold font-mono tracking-tight text-foreground tabular-nums">
                   {site ? site.performance_score : 98}/100
                 </div>
-                <p className="text-[11px] text-emerald-400 font-mono mt-1 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <p className="text-[11px] text-emerald-500 font-mono mt-1 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>99.99% Edge Availability</span>
                 </p>
               </CardContent>
@@ -210,24 +210,24 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               </CardHeader>
               <CardContent>
                 {/* Clean SVG Bar Chart with shadcn palette */}
-                <div className="h-56 sm:h-64 w-full flex items-end gap-3 sm:gap-6 pt-6 pb-2 px-2 border-b border-zinc-800/80">
+                <div className="h-56 sm:h-64 w-full flex items-end gap-3 sm:gap-6 pt-6 pb-2 px-2 border-b border-border/80">
                   {trafficData.map((d, idx) => {
                     const heightPercent = Math.round((d.visitors / maxVisitors) * 100);
                     return (
                       <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                        <div className="text-[10px] font-mono text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity tabular-nums">
+                        <div className="text-[10px] font-mono text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity tabular-nums">
                           {d.visitors}
                         </div>
-                        <div className="w-full bg-zinc-800 hover:bg-violet-600 rounded-t-sm transition-colors relative" style={{ height: `${heightPercent}%` }} />
-                        <div className="text-[10px] font-mono text-zinc-400">{d.date.split(' ')[0]}</div>
+                        <div className="w-full bg-muted hover:bg-primary rounded-t-sm transition-colors relative" style={{ height: `${heightPercent}%` }} />
+                        <div className="text-[10px] font-mono text-muted-foreground">{d.date.split(' ')[0]}</div>
                       </div>
                     );
                   })}
                 </div>
 
-                <div className="mt-4 flex items-center justify-between text-xs text-zinc-400 font-mono">
-                  <span>Average: <strong>540 visits/day</strong></span>
-                  <span className="text-emerald-400">Core Web Vitals Pass Grade</span>
+                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground font-mono">
+                  <span>Average: <strong className="text-foreground">540 visits/day</strong></span>
+                  <span className="text-emerald-500">Core Web Vitals Pass Grade</span>
                 </div>
               </CardContent>
             </Card>
@@ -265,23 +265,23 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
                       <div
                         key={lead.id}
                         onClick={() => onNavigateTab('leads')}
-                        className="flex items-center justify-between gap-3 p-1 rounded-md hover:bg-zinc-800/30 transition-colors cursor-pointer"
+                        className="flex items-center justify-between gap-3 p-1 rounded-md hover:bg-accent/40 transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-mono font-bold text-xs text-zinc-200 shrink-0">
+                          <div className="size-9 rounded-full bg-muted border border-border flex items-center justify-center font-mono font-bold text-xs text-foreground shrink-0">
                             {initials}
                           </div>
                           <div className="space-y-0.5 min-w-0">
-                            <p className="text-xs font-medium text-white truncate leading-none">
+                            <p className="text-xs font-medium text-foreground truncate leading-none">
                               {lead.name}
                             </p>
-                            <p className="text-[11px] text-zinc-400 font-mono truncate">
+                            <p className="text-[11px] text-muted-foreground font-mono truncate">
                               {lead.email}
                             </p>
                           </div>
                         </div>
 
-                        <div className="font-mono text-xs font-semibold text-emerald-400 tabular-nums shrink-0">
+                        <div className="font-mono text-xs font-semibold text-emerald-500 tabular-nums shrink-0">
                           {lead.value ? `+${formatCurrency(lead.value)}` : 'Qualified'}
                         </div>
                       </div>
@@ -293,15 +293,15 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
           </div>
 
           {/* 5. Cloudflare & Vercel Telemetry Status Strip */}
-          <div className="p-3.5 rounded-lg border border-zinc-800 bg-[#0a0b10] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-400 font-mono">
+          <div className="p-3.5 rounded-lg border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-muted-foreground font-mono">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Multi-Tenant RLS Status: <strong className="text-emerald-400">ACTIVE & SECURED</strong></span>
+              <ShieldCheck className="size-4 text-emerald-500 shrink-0" />
+              <span>Multi-Tenant RLS Status: <strong className="text-emerald-500">ACTIVE & SECURED</strong></span>
             </div>
             <div className="flex items-center gap-3">
-              <span>Care Plan: <strong className="text-zinc-200 uppercase">{currentTenant.care_plan}</strong></span>
-              <span className="text-zinc-700">|</span>
-              <span>Next Audit: <strong className="text-zinc-200">Oct 12, 2026</strong></span>
+              <span>Care Plan: <strong className="text-foreground uppercase">{currentTenant.care_plan}</strong></span>
+              <span className="text-border">|</span>
+              <span>Next Audit: <strong className="text-foreground">Oct 12, 2026</strong></span>
             </div>
           </div>
         </TabsContent>

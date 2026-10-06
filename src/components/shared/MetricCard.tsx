@@ -29,47 +29,47 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     <div
       onClick={onClick}
       className={cn(
-        'bg-[#0b0c10] border border-zinc-800/80 rounded-lg p-3.5 sm:p-4.5 transition-all duration-150',
-        onClick && 'cursor-pointer hover:border-zinc-700 hover:bg-[#101117]',
+        'bg-card border border-border rounded-lg p-3.5 sm:p-4.5 transition-all duration-150 shadow-xs',
+        onClick && 'cursor-pointer hover:border-border/80 hover:bg-accent/40',
         className
       )}
     >
-      <div className="flex items-center justify-between text-zinc-400">
-        <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-medium">
+      <div className="flex items-center justify-between text-muted-foreground">
+        <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-medium">
           {title}
         </span>
         {icon && (
-          <div className="p-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
+          <div className="p-1 rounded bg-muted border border-border text-foreground">
             {icon}
           </div>
         )}
       </div>
 
       <div className="mt-2.5 sm:mt-3 flex items-baseline justify-between gap-2">
-        <div className="text-xl sm:text-2xl font-bold tracking-tight text-white font-mono tabular-nums">
+        <div className="text-xl sm:text-2xl font-bold tracking-tight text-foreground font-mono tabular-nums">
           {value}
         </div>
         {badge && (
-          <span className="px-1.5 py-0.5 text-[10px] font-mono uppercase font-semibold bg-violet-950/40 text-violet-300 border border-violet-800/40 rounded">
+          <span className="px-1.5 py-0.5 text-[10px] font-mono uppercase font-semibold bg-muted text-foreground border border-border rounded">
             {badge}
           </span>
         )}
       </div>
 
       {(subValue || change) && (
-        <div className="mt-2 flex items-center justify-between text-[11px] text-zinc-400 pt-2 border-t border-zinc-800/50">
+        <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground pt-2 border-t border-border/60">
           {subValue && <span className="truncate pr-2">{subValue}</span>}
           {change && (
             <div
               className={cn(
                 'inline-flex items-center gap-0.5 font-mono tabular-nums shrink-0 font-medium',
-                changeType === 'positive' && 'text-emerald-400',
-                changeType === 'negative' && 'text-rose-400',
-                changeType === 'neutral' && 'text-zinc-400'
+                changeType === 'positive' && 'text-emerald-500',
+                changeType === 'negative' && 'text-destructive',
+                changeType === 'neutral' && 'text-muted-foreground'
               )}
             >
-              {changeType === 'positive' && <ArrowUpRight className="w-3 h-3" />}
-              {changeType === 'negative' && <ArrowDownRight className="w-3 h-3" />}
+              {changeType === 'positive' && <ArrowUpRight className="size-3" />}
+              {changeType === 'negative' && <ArrowDownRight className="size-3" />}
               <span>{change}</span>
             </div>
           )}

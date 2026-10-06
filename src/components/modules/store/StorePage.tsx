@@ -15,9 +15,9 @@ export const StorePage: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="pb-3 sm:pb-4 border-b border-zinc-800">
-        <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">Store & Checkouts</h1>
-        <p className="text-xs text-zinc-400 mt-0.5">
+      <div className="pb-3 sm:pb-4 border-b border-border">
+        <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Store & Checkouts</h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
           Headless e-commerce telemetry, order fulfillment, and transaction logs.
         </p>
       </div>
@@ -30,7 +30,7 @@ export const StorePage: React.FC = () => {
           subValue="Processed via Stripe"
           change="+24.6%"
           changeType="positive"
-          icon={<DollarSign className="w-3.5 h-3.5 text-emerald-400" />}
+          icon={<DollarSign className="w-3.5 h-3.5 text-emerald-500" />}
         />
         <MetricCard
           title="Orders"
@@ -38,7 +38,7 @@ export const StorePage: React.FC = () => {
           subValue="Avg value $262"
           change="+18.2%"
           changeType="positive"
-          icon={<ShoppingBag className="w-3.5 h-3.5 text-sky-400" />}
+          icon={<ShoppingBag className="w-3.5 h-3.5 text-sky-500" />}
         />
         <MetricCard
           title="Fulfillment"
@@ -46,30 +46,30 @@ export const StorePage: React.FC = () => {
           subValue="Zero backlog"
           change="Optimal"
           changeType="positive"
-          icon={<PackageCheck className="w-3.5 h-3.5 text-violet-400" />}
+          icon={<PackageCheck className="w-3.5 h-3.5 text-foreground" />}
         />
       </div>
 
       {/* Orders Ledger (Responsive: Card list on mobile, Table on tablet/desktop) */}
-      <div className="bg-[#0b0c10] border border-zinc-800 rounded-lg overflow-hidden shadow-xs">
-        <div className="p-3.5 sm:p-4 border-b border-zinc-800 bg-[#0e0f14]">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-200 font-mono">
+      <div className="bg-card border border-border rounded-lg overflow-hidden shadow-xs">
+        <div className="p-3.5 sm:p-4 border-b border-border bg-muted/40">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground font-mono">
             Recent Store Orders
           </h2>
         </div>
 
         {/* Mobile View */}
-        <div className="sm:hidden divide-y divide-zinc-800/60">
+        <div className="sm:hidden divide-y divide-border/60">
           {orders.map((ord) => (
             <div key={ord.id} className="p-3.5 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-white">{ord.order_number}</span>
+                <span className="font-mono text-xs font-bold text-foreground">{ord.order_number}</span>
                 <StatusBadge status={ord.status} />
               </div>
-              <div className="text-xs text-zinc-300">{ord.customer_name}</div>
-              <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 pt-1">
+              <div className="text-xs text-muted-foreground">{ord.customer_name}</div>
+              <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground pt-1">
                 <span>{ord.items_count} items</span>
-                <span className="font-bold text-emerald-400 text-xs">{formatCurrency(ord.total)}</span>
+                <span className="font-bold text-emerald-500 text-xs">{formatCurrency(ord.total)}</span>
               </div>
             </div>
           ))}
@@ -79,7 +79,7 @@ export const StorePage: React.FC = () => {
         <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400 font-mono uppercase text-[10px]">
+              <tr className="border-b border-border text-muted-foreground font-mono uppercase text-[10px] bg-muted/30">
                 <th className="py-2.5 px-4 font-medium">Order #</th>
                 <th className="py-2.5 px-4 font-medium">Customer</th>
                 <th className="py-2.5 px-4 font-medium">Items</th>
@@ -88,19 +88,19 @@ export const StorePage: React.FC = () => {
                 <th className="py-2.5 px-4 font-medium text-right">Fulfillment</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/40">
+            <tbody className="divide-y divide-border/40">
               {orders.map((ord) => (
-                <tr key={ord.id} className="hover:bg-zinc-900/30 transition-colors">
-                  <td className="py-3 px-4 font-mono font-bold text-white">{ord.order_number}</td>
+                <tr key={ord.id} className="hover:bg-accent/40 transition-colors">
+                  <td className="py-3 px-4 font-mono font-bold text-foreground">{ord.order_number}</td>
                   <td className="py-3 px-4">
-                    <div className="font-medium text-zinc-200">{ord.customer_name}</div>
-                    <div className="text-[10px] text-zinc-400 font-mono">{ord.customer_email}</div>
+                    <div className="font-medium text-foreground">{ord.customer_name}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono">{ord.customer_email}</div>
                   </td>
-                  <td className="py-3 px-4 text-zinc-300 font-mono">{ord.items_count} items</td>
-                  <td className="py-3 px-4 font-mono font-semibold text-emerald-400 tabular-nums">
+                  <td className="py-3 px-4 text-foreground font-mono">{ord.items_count} items</td>
+                  <td className="py-3 px-4 font-mono font-semibold text-emerald-500 tabular-nums">
                     {formatCurrency(ord.total)}
                   </td>
-                  <td className="py-3 px-4 text-zinc-400 font-mono text-[11px]">
+                  <td className="py-3 px-4 text-muted-foreground font-mono text-[11px]">
                     {formatDateTime(ord.created_at)}
                   </td>
                   <td className="py-3 px-4 text-right">

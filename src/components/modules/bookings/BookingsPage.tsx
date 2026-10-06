@@ -66,10 +66,10 @@ export const BookingsPage: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-border">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">Bookings & Schedule</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Bookings & Schedule</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Appointment flow synchronized with client booking widgets.
           </p>
         </div>
@@ -84,17 +84,17 @@ export const BookingsPage: React.FC = () => {
       </div>
 
       {/* Integration Readiness Banner */}
-      <div className="p-3.5 rounded-lg border border-zinc-800 bg-[#0b0c10] flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-3.5 rounded-lg border border-border bg-card flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center text-violet-400">
+          <div className="w-7 h-7 rounded bg-muted border border-border flex items-center justify-center text-foreground">
             <Calendar className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-semibold text-white flex items-center gap-2 font-mono">
+            <div className="text-xs font-semibold text-foreground flex items-center gap-2 font-mono">
               <span>CALENDAR WEBHOOK ENDPOINT</span>
-              <span className="text-[10px] text-emerald-400">ACTIVE</span>
+              <span className="text-[10px] text-emerald-500 font-bold">ACTIVE</span>
             </div>
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-[11px] text-muted-foreground">
               Two-way sync architecture for Google Calendar, Outlook, and automated SMS alerts.
             </p>
           </div>
@@ -102,15 +102,15 @@ export const BookingsPage: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-zinc-800/80">
+      <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-border/80">
         {(['upcoming', 'completed', 'cancelled', 'all'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
             className={`px-3 py-1.5 text-xs font-medium capitalize rounded-md transition-colors min-h-[36px] ${
               filter === tab
-                ? 'bg-zinc-800 text-white font-semibold'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-accent text-accent-foreground font-semibold shadow-2xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/40'
             }`}
           >
             {tab}
@@ -121,7 +121,7 @@ export const BookingsPage: React.FC = () => {
       {/* Bookings List (1 col mobile, 2 col tablet, 3 col desktop) */}
       {filteredBookings.length === 0 ? (
         <EmptyState
-          icon={<CalendarDays className="w-6 h-6 text-violet-400" />}
+          icon={<CalendarDays className="w-6 h-6 text-foreground" />}
           title="No bookings in this view"
           description="Appointments booked through your website's scheduling system will appear here."
           actionLabel="Add Appointment"
@@ -132,39 +132,39 @@ export const BookingsPage: React.FC = () => {
           {filteredBookings.map((b) => (
             <div
               key={b.id}
-              className="bg-[#0b0c10] border border-zinc-800 rounded-lg p-4 shadow-xs space-y-3 hover:border-zinc-700 transition-colors"
+              className="bg-card border border-border rounded-lg p-4 shadow-xs space-y-3 hover:border-border/80 transition-colors"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-white tracking-tight">
+                  <h3 className="text-xs sm:text-sm font-semibold text-foreground tracking-tight">
                     {b.service_name}
                   </h3>
-                  <div className="text-[11px] text-zinc-400 flex items-center gap-1.5 mt-0.5 font-mono">
-                    <Clock className="w-3 h-3 text-violet-400" />
+                  <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5 font-mono">
+                    <Clock className="w-3 h-3 text-muted-foreground" />
                     <span>{formatDateTime(b.booking_time)}</span>
                   </div>
                 </div>
                 <StatusBadge status={b.status} />
               </div>
 
-              <div className="p-2.5 rounded bg-[#0f1015] border border-zinc-800/80 text-xs space-y-0.5">
-                <div className="font-medium text-zinc-200 flex items-center gap-1.5">
-                  <User className="w-3 h-3 text-zinc-400" />
+              <div className="p-2.5 rounded bg-muted/40 border border-border text-xs space-y-0.5">
+                <div className="font-medium text-foreground flex items-center gap-1.5">
+                  <User className="w-3 h-3 text-muted-foreground" />
                   <span>{b.customer_name}</span>
                 </div>
-                <div className="text-zinc-400 font-mono text-[11px] truncate">
+                <div className="text-muted-foreground font-mono text-[11px] truncate">
                   {b.customer_email}
                 </div>
                 {b.customer_phone && (
-                  <div className="text-zinc-400 font-mono text-[10px]">
+                  <div className="text-muted-foreground font-mono text-[10px]">
                     {b.customer_phone}
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-zinc-800 font-mono">
+              <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border font-mono">
                 <span>Fee</span>
-                <span className="font-bold text-emerald-400 tabular-nums">
+                <span className="font-bold text-emerald-500 tabular-nums">
                   {formatCurrency(b.price)}
                 </span>
               </div>
@@ -220,7 +220,7 @@ export const BookingsPage: React.FC = () => {
             />
           </div>
 
-          <div className="flex justify-end gap-2.5 pt-3 border-t border-zinc-800">
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-border">
             <Button
               type="button"
               variant="ghost"

@@ -1,0 +1,7 @@
+{
+  "name": "LevelUp Dashboard",
+  "description": "Custom multi-tenant client portal and digital operations platform for LevelUp Ecosystem web design & digital solutions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

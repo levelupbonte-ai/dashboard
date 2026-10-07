@@ -351,12 +351,20 @@ export interface PrioritizedAttentionItem {
   action_label: string;
 }
 
+export interface DashboardNavSubItem {
+  id: string;
+  subTab: string;
+  title: string;
+  icon?: string;
+}
+
 export interface DashboardNavTab {
   id: string;
   title: string;
   icon: string;
   badge?: string | number;
   badgeColor?: string;
+  subItems?: DashboardNavSubItem[];
 }
 
 export interface DashboardNavGroup {
@@ -374,9 +382,18 @@ export interface DashboardEngineConfig {
     key: string;
     label: string;
     value: string | number;
+    numericValue?: number;
+    prefix?: string;
+    suffix?: string;
+    decimals?: number;
     change?: string;
+    changeType?: 'positive' | 'negative' | 'neutral';
+    comparisonPeriod?: string;
     subtext?: string;
     isPositive?: boolean;
+    sparklineData?: number[];
+    sparklineColor?: 'emerald' | 'rose' | 'indigo' | 'amber' | 'blue' | 'slate';
+    emptyMessage?: string;
   }[];
 }
 

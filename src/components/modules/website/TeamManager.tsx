@@ -172,13 +172,13 @@ export const TeamManager: React.FC<TeamManagerProps> = ({
                 <div className="flex items-start justify-between gap-2">
                   <h4 className="text-xs font-semibold text-foreground truncate">{m.name}</h4>
                   <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded border ${
+                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded border ${
                       m.status === 'published'
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                        : 'bg-muted text-muted-foreground border-border'
+                        ? 'bg-muted text-foreground border-border/60'
+                        : 'bg-muted/40 text-muted-foreground border-border/40'
                     }`}
                   >
-                    {m.status === 'published' ? 'Live' : 'Draft'}
+                    {m.status === 'published' ? 'Active' : 'Draft'}
                   </span>
                 </div>
 

@@ -188,13 +188,13 @@ export const ProductsManager: React.FC<ProductsManagerProps> = ({
                       {p.sku}
                     </span>
                     <span
-                      className={`text-[11px] font-medium px-2 py-0.5 rounded border ${
+                      className={`text-[10px] font-mono px-1.5 py-0.2 rounded border ${
                         p.status === 'published'
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                          : 'bg-muted text-muted-foreground border-border'
+                          ? 'bg-muted text-foreground border-border/60'
+                          : 'bg-muted/40 text-muted-foreground border-border/40'
                       }`}
                     >
-                      {p.status === 'published' ? 'Live' : 'Draft'}
+                      {p.status === 'published' ? 'Published' : 'Draft'}
                     </span>
                   </div>
 

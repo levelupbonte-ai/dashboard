@@ -241,8 +241,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-2.5 border-t border-zinc-800 bg-[#06070a] text-[10px] text-zinc-400">
           <div className="flex items-center justify-between font-mono">
             <span>ISOLATION</span>
-            <span className="inline-flex items-center gap-1 text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               POSTGRES RLS
             </span>
           </div>
@@ -252,7 +251,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       ) : (
         <div className="p-2 border-t border-zinc-800 flex justify-center">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="RLS Enforced" />
+          <span className="text-[9px] font-mono text-emerald-400/80" title="RLS Enforced">RLS</span>
         </div>
       )}
     </aside>

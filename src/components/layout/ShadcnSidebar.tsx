@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   Globe,
@@ -26,6 +26,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   MessageSquare,
 } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
@@ -39,7 +40,8 @@ import { websiteDataService } from '../../services/websiteDataService';
 
 interface ShadcnSidebarProps {
   activeTab: string;
-  onSelectTab: (tabId: string) => void;
+  websiteSubTab?: string;
+  onSelectTab: (tabId: string, subTab?: string) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   pendingRequestsCount: number;
@@ -48,6 +50,7 @@ interface ShadcnSidebarProps {
 
 export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
   activeTab,
+  websiteSubTab = 'info',
   onSelectTab,
   isCollapsed,
   onToggleCollapse,
@@ -55,6 +58,24 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
 }) => {
   const { currentTenant, activeWebsite, websites } = useTenant();
   const { orgRole } = useAuth();
+
+  // Collapsible parent state (expanded by default when on website tab)
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    'website-control': true,
+  });
+
+  useEffect(() => {
+    if (activeTab === 'website-control') {
+      setExpandedSections((prev) => ({ ...prev, 'website-control': true }));
+    }
+  }, [activeTab]);
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
+    }));
+  };
 
   const site = activeWebsite || websites[0];
   const bookings = dataService.getBookings(currentTenant.id);
@@ -160,47 +181,97 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
               {group.items.map((item) => {
                 const Icon = getIconComponent(item.icon);
                 const isActive = activeTab === item.id;
+                const hasSubItems = Boolean(item.subItems && item.subItems.length > 0);
+                const isExpanded = Boolean(expandedSections[item.id]);
+
                 return (
-                  <button
-                    key={item.id}
-                    onClick={() => onSelectTab(item.id)}
-                    className={cn(
-                      'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] leading-none transition-colors text-left relative group',
-                      isActive
-                        ? 'bg-accent/80 text-accent-foreground font-medium'
-                        : 'text-muted-foreground hover:bg-accent/40 hover:text-foreground font-normal',
-                      isCollapsed && 'justify-center px-1.5'
-                    )}
-                    title={isCollapsed ? item.title : undefined}
-                  >
-                    <Icon
+                  <div key={item.id} className="space-y-0.5">
+                    <button
+                      onClick={() => {
+                        if (hasSubItems && !isCollapsed && isActive) {
+                          toggleSection(item.id);
+                        } else if (hasSubItems && !isCollapsed && !isExpanded) {
+                          setExpandedSections((prev) => ({ ...prev, [item.id]: true }));
+                        }
+                        onSelectTab(item.id);
+                      }}
                       className={cn(
-                        'size-4 shrink-0 transition-colors',
+                        'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] leading-none transition-colors text-left relative group',
                         isActive
-                          ? 'text-foreground'
-                          : 'text-muted-foreground group-hover:text-foreground'
+                          ? 'bg-accent/80 text-accent-foreground font-medium'
+                          : 'text-muted-foreground hover:bg-accent/40 hover:text-foreground font-normal',
+                        isCollapsed && 'justify-center px-1.5'
                       )}
-                    />
-
-                    {!isCollapsed && (
-                      <span className="truncate flex-1">{item.title}</span>
-                    )}
-
-                    {!isCollapsed && item.badge !== undefined && (
-                      <span
+                      title={isCollapsed ? item.title : undefined}
+                    >
+                      <Icon
                         className={cn(
-                          'text-[10px] font-mono px-1.5 py-0.2 rounded border',
-                          item.badgeColor === 'amber'
-                            ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                            : item.badgeColor === 'rose'
-                            ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                            : 'bg-muted text-muted-foreground border-border'
+                          'size-4 shrink-0 transition-colors',
+                          isActive
+                            ? 'text-foreground'
+                            : 'text-muted-foreground group-hover:text-foreground'
                         )}
-                      >
-                        {item.badge}
-                      </span>
+                      />
+
+                      {!isCollapsed && (
+                        <span className="truncate flex-1">{item.title}</span>
+                      )}
+
+                      {!isCollapsed && item.badge !== undefined && (
+                        <span
+                          className={cn(
+                            'text-[10px] font-mono px-1.5 py-0.2 rounded border',
+                            item.badgeColor === 'amber'
+                              ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                              : item.badgeColor === 'rose'
+                              ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                              : 'bg-muted text-muted-foreground border-border'
+                          )}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+
+                      {!isCollapsed && hasSubItems && (
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSection(item.id);
+                          }}
+                          className="size-4 flex items-center justify-center text-muted-foreground hover:text-foreground transition-transform"
+                        >
+                          {isExpanded ? (
+                            <ChevronDown className="size-3.5" />
+                          ) : (
+                            <ChevronRight className="size-3.5" />
+                          )}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Nested Sub-Sections (Cloudflare-style tree line) */}
+                    {!isCollapsed && hasSubItems && isExpanded && (
+                      <div className="ml-4 pl-3.5 border-l border-border/60 space-y-0.5 my-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                        {item.subItems!.map((sub) => {
+                          const isSubActive = isActive && websiteSubTab === sub.subTab;
+                          return (
+                            <button
+                              key={sub.id}
+                              onClick={() => onSelectTab(item.id, sub.subTab)}
+                              className={cn(
+                                'w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-[12px] leading-snug transition-colors text-left',
+                                isSubActive
+                                  ? 'bg-accent/70 text-accent-foreground font-semibold'
+                                  : 'text-muted-foreground/80 hover:text-foreground hover:bg-accent/30 font-normal'
+                              )}
+                            >
+                              <span className="truncate">{sub.title}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     )}
-                  </button>
+                  </div>
                 );
               })}
             </div>

@@ -25,7 +25,7 @@ export const NavUser: React.FC<NavUserProps> = ({
   onNavigateTab,
   onOpenNotifications,
 }) => {
-  const { user, orgRole, setOrgRole, can } = useAuth();
+  const { user, orgRole, setOrgRole, can, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   const canViewBilling = can('billing.view');
@@ -172,7 +172,10 @@ export const NavUser: React.FC<NavUserProps> = ({
 
             <div className="pt-1 mt-1 border-t border-border/80">
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  logout();
+                }}
                 className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-destructive hover:bg-destructive/10 transition-colors text-left"
               >
                 <LogOut className="size-3.5" />

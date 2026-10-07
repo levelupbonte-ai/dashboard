@@ -76,6 +76,32 @@
   background: var(--muted-foreground);
 }
 
+/* SVG Line Draw Animation */
+@keyframes sparkline-draw {
+  0% {
+    stroke-dashoffset: 300;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Page load controlled stagger */
+@keyframes dashboard-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: dashboard-fade-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Touch target helpers */
 @media (pointer: coarse) {
   button, a {

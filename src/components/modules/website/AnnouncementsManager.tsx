@@ -185,11 +185,11 @@ export const AnnouncementsManager: React.FC<AnnouncementsManagerProps> = ({
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded border font-mono ${
                     ann.status === 'published'
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                      : 'bg-muted text-muted-foreground border-border'
+                      ? 'bg-muted text-foreground border-border/60'
+                      : 'bg-muted/40 text-muted-foreground border-border/40'
                   }`}
                 >
-                  {ann.status === 'published' ? 'Live on Site' : 'Draft'}
+                  {ann.status === 'published' ? 'Published' : 'Draft'}
                 </span>
               </div>
 

@@ -41,7 +41,8 @@ import { websiteDataService } from '../../services/websiteDataService';
 
 interface MobileNavProps {
   activeTab: string;
-  onSelectTab: (tabId: string) => void;
+  websiteSubTab?: string;
+  onSelectTab: (tabId: string, subTab?: string) => void;
   pendingRequestsCount: number;
   isOpen: boolean;
   onClose: () => void;
@@ -50,6 +51,7 @@ interface MobileNavProps {
 
 export const MobileNav: React.FC<MobileNavProps> = ({
   activeTab,
+  websiteSubTab,
   onSelectTab,
   isOpen,
   onClose,
@@ -239,36 +241,58 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                   {section.items.map((item) => {
                     const Icon = getIconComponent(item.icon);
                     const isActive = activeTab === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          onSelectTab(item.id);
-                          onClose();
-                        }}
-                        className={cn(
-                          'w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium text-left transition-colors min-h-[40px]',
-                          isActive
-                            ? 'bg-accent text-accent-foreground font-semibold'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-accent/40'
-                        )}
-                      >
-                        <div className="flex items-center gap-2.5 truncate">
-                          <Icon
-                            className={cn(
-                              'size-4',
-                              isActive ? 'text-foreground' : 'text-muted-foreground'
-                            )}
-                          />
-                          <span className="truncate">{item.title}</span>
-                        </div>
+                    const hasSubItems = Boolean(item.subItems && item.subItems.length > 0);
 
-                        {item.badge !== undefined && (
-                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border">
-                            {item.badge}
-                          </span>
+                    return (
+                      <div key={item.id} className="space-y-1">
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            onSelectTab(item.id);
+                            onClose();
+                          }}
+                          className={cn(
+                            'w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium text-left transition-colors min-h-[40px]',
+                            isActive
+                              ? 'bg-accent text-accent-foreground font-semibold'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-accent/40'
+                          )}
+                        >
+                          <div className="flex items-center gap-2.5 truncate">
+                            <Icon
+                              className={cn(
+                                'size-4',
+                                isActive ? 'text-foreground' : 'text-muted-foreground'
+                              )}
+                            />
+                            <span className="truncate">{item.title}</span>
+                          </div>
+
+                          {item.badge !== undefined && (
+                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border">
+                              {item.badge}
+                            </span>
+                          )}
+                        </button>
+
+                        {/* If on website control, show mobile sub-items */}
+                        {hasSubItems && isActive && (
+                          <div className="ml-5 pl-3 border-l border-border/60 space-y-1 py-1">
+                            {item.subItems!.map((sub) => (
+                              <button
+                                key={sub.id}
+                                onClick={() => {
+                                  onSelectTab(item.id, sub.subTab);
+                                  onClose();
+                                }}
+                                className="w-full flex items-center justify-between px-2 py-1.5 rounded text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent/30 text-left"
+                              >
+                                <span className="truncate">{sub.title}</span>
+                              </button>
+                            ))}
+                          </div>
                         )}
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -278,7 +302,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             {/* Footer */}
             <div className="pt-3 border-t border-border text-xs text-muted-foreground flex items-center justify-between">
               <span>{currentTenant.name}</span>
-              <span className="text-emerald-500 font-medium text-xs">Website Live</span>
+              <span className="font-mono text-[11px] text-muted-foreground">{currentTenant.slug}</span>
             </div>
           </div>
         </div>

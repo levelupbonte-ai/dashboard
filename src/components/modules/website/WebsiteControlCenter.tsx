@@ -17,6 +17,7 @@ import {
   Menu as MenuIcon,
   History,
   Monitor,
+  Maximize2,
 } from 'lucide-react';
 import { useTenant } from '../../../context/TenantContext';
 import { useAuth } from '../../../context/AuthContext';
@@ -35,16 +36,15 @@ import { BlogManager } from './BlogManager';
 import { FaqManager } from './FaqManager';
 import { NavigationManager } from './NavigationManager';
 import { LiveWebsitePreviewModal } from './LiveWebsitePreviewModal';
-import { StatusBadge } from '../../ui/StatusBadge';
 
 interface WebsiteControlCenterProps {
   initialSubTab?: string;
   onRequestChange: () => void;
-  onNavigateTab: (tabId: string) => void;
+  onNavigateTab: (tabId: string, subTab?: string) => void;
 }
 
 export const WebsiteControlCenter: React.FC<WebsiteControlCenterProps> = ({
-  initialSubTab = 'info',
+  initialSubTab = 'homepage',
   onRequestChange,
 }) => {
   const { currentTenant, websites, activeWebsite, setActiveWebsite } = useTenant();
@@ -54,12 +54,12 @@ export const WebsiteControlCenter: React.FC<WebsiteControlCenterProps> = ({
   const site = activeWebsite || websites[0];
   const type = determineWebsiteType(currentTenant, site);
 
-  const [activeSubTab, setActiveSubTab] = useState<string>(initialSubTab);
+  const [activeSubTab, setActiveSubTab] = useState<string>(initialSubTab || 'homepage');
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState<boolean>(false);
 
   // Sync sub tab if initialSubTab prop changes
   React.useEffect(() => {
-    if (initialSubTab) {
+    if (initialSubTab && initialSubTab !== 'preview') {
       setActiveSubTab(initialSubTab);
     }
   }, [initialSubTab]);
@@ -74,10 +74,9 @@ export const WebsiteControlCenter: React.FC<WebsiteControlCenterProps> = ({
 
   const auditLogs = websiteDataService.getAuditLogs(currentTenant.id);
 
-  // Sub-navigation definition adapted dynamically to website type
+  // Clean sub-navigation tabs for website content management
   const tabs = [
-    { id: 'info', label: 'Business Info', icon: Info },
-    { id: 'homepage', label: 'Homepage & Hero', icon: Layout },
+    { id: 'homepage', label: 'Pages & Content', icon: Layout },
     { id: 'media', label: 'Media Library', icon: Image },
     ...(type === 'restaurant'
       ? [{ id: 'menu', label: 'Food & Wine Menu', icon: Utensils }]
@@ -99,14 +98,13 @@ export const WebsiteControlCenter: React.FC<WebsiteControlCenterProps> = ({
       ? [{ id: 'blog', label: 'Editorial Journal', icon: BookOpen }]
       : []),
     { id: 'faqs', label: 'FAQs', icon: HelpCircle },
+    { id: 'info', label: 'Business Details', icon: Info },
     { id: 'navigation', label: 'Navigation Menu', icon: MenuIcon },
     { id: 'audit', label: 'Audit History', icon: History },
   ];
 
   const renderActiveTabContent = () => {
     switch (activeSubTab) {
-      case 'info':
-        return <WebsiteInfoEditor website={site} isReadOnly={isReadOnly} />;
       case 'homepage':
         return <HomepageHeroEditor website={site} isReadOnly={isReadOnly} />;
       case 'media':
@@ -181,6 +179,8 @@ export const WebsiteControlCenter: React.FC<WebsiteControlCenterProps> = ({
             isReadOnly={isReadOnly}
           />
         );
+      case 'info':
+        return <WebsiteInfoEditor website={site} isReadOnly={isReadOnly} />;
       case 'navigation':
         return (
           <NavigationManager
@@ -221,92 +221,119 @@ export const WebsiteControlCenter: React.FC<WebsiteControlCenterProps> = ({
           </div>
         );
       default:
-        return <WebsiteInfoEditor website={site} isReadOnly={isReadOnly} />;
+        return <HomepageHeroEditor website={site} isReadOnly={isReadOnly} />;
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* 1. Website Header Bar */}
-      <div className="bg-card border border-border rounded-lg p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
-        <div className="space-y-1.5">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="p-1.5 rounded-md bg-primary/10 text-primary">
-              <Globe className="size-4" />
+      {/* 1. Website Header with Compact Embedded Preview Screen ("Petit Écran de Preview") */}
+      <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        {/* Left: Site Info, Metrics & Actions */}
+        <div className="space-y-3 flex-1 min-w-0">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* If tenant has multiple websites, offer a clean selector */}
+              {websites.length > 1 ? (
+                <select
+                  value={site.id}
+                  onChange={(e) => {
+                    const target = websites.find((w) => w.id === e.target.value);
+                    if (target) setActiveWebsite(target);
+                  }}
+                  className="font-bold text-base sm:text-xl bg-transparent text-foreground border-b border-border/60 pb-0.5 focus:outline-hidden cursor-pointer"
+                >
+                  {websites.map((w) => (
+                    <option key={w.id} value={w.id} className="bg-card text-foreground">
+                      {w.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <h2 className="font-bold text-base sm:text-xl text-foreground tracking-tight truncate">
+                  {site.name}
+                </h2>
+              )}
+
+              <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border shrink-0">
+                {site.domain}
+              </span>
             </div>
 
-            {/* If tenant has multiple websites, offer a clean selector */}
-            {websites.length > 1 ? (
-              <select
-                value={site.id}
-                onChange={(e) => {
-                  const target = websites.find((w) => w.id === e.target.value);
-                  if (target) setActiveWebsite(target);
-                }}
-                className="font-bold text-base sm:text-lg bg-transparent text-foreground border-b border-border/60 pb-0.5 focus:outline-hidden cursor-pointer"
-              >
-                {websites.map((w) => (
-                  <option key={w.id} value={w.id} className="bg-card text-foreground">
-                    {w.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <h2 className="font-bold text-base sm:text-lg text-foreground tracking-tight">
-                {site.name}
-              </h2>
-            )}
-
-            <StatusBadge status={site.status} />
-
-            <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border">
-              {site.domain}
-            </span>
+            <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-2 pt-0.5">
+              <span>Framework: <strong className="text-foreground font-medium">Next.js 16 + Tailwind</strong></span>
+              <span>·</span>
+              <span>Core Vitals: <strong className="text-emerald-500 font-mono font-semibold">{site.performance_score}/100</strong></span>
+              <span>·</span>
+              <span>SEO Index: <strong className="text-foreground font-mono font-semibold">{site.seo_score}/100</strong></span>
+            </div>
           </div>
 
-          <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-3">
-            <span>Production Architecture: <strong className="text-foreground">{site.framework}</strong></span>
-            <span>·</span>
-            <span>Performance Score: <strong className="text-emerald-500">{site.performance_score}/100</strong></span>
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            <button
+              type="button"
+              onClick={onRequestChange}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity shadow-xs"
+            >
+              <Sparkles className="size-3.5 text-primary" />
+              <span>Request Code Change</span>
+            </button>
+
+            <a
+              href={site.preview_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-border bg-card text-foreground hover:bg-muted text-xs font-medium transition-colors"
+              title="Open site in new tab"
+            >
+              <span>Visit</span>
+              <ExternalLink className="size-3" />
+            </a>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Live Interactive Preview */}
-          <button
-            type="button"
-            onClick={() => setIsPreviewModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity shadow-xs"
-          >
-            <Monitor className="size-3.5" />
-            <span>Interactive Preview</span>
-          </button>
+        {/* Right: Le Petit Écran de Preview Embed (Compact Live Interactive Frame) */}
+        <div
+          onClick={() => setIsPreviewModalOpen(true)}
+          className="relative w-full sm:w-72 md:w-80 aspect-[16/10] bg-[#07080c] border border-border/80 rounded-lg overflow-hidden shadow-md cursor-pointer group shrink-0 hover:border-foreground/40 transition-all"
+          title="Click to expand Live Preview"
+        >
+          {/* Mini browser top bar with macOS dots */}
+          <div className="h-6 bg-muted/60 border-b border-border/60 px-2.5 flex items-center justify-between text-[10px] text-muted-foreground select-none">
+            <div className="flex items-center gap-1">
+              <span className="size-1.5 rounded-full bg-rose-500/80" />
+              <span className="size-1.5 rounded-full bg-amber-500/80" />
+              <span className="size-1.5 rounded-full bg-emerald-500/80" />
+            </div>
+            <span className="font-mono text-[9px] text-muted-foreground/80 truncate max-w-[130px]">
+              {site.domain}
+            </span>
+            <ExternalLink className="size-2.5 opacity-60 group-hover:opacity-100 transition-opacity" />
+          </div>
 
-          {/* Request Structural Change */}
-          <button
-            type="button"
-            onClick={onRequestChange}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-card text-foreground hover:bg-muted text-xs font-medium transition-colors"
-          >
-            <Sparkles className="size-3.5 text-primary" />
-            <span>Request Code Change</span>
-          </button>
+          {/* Scaled Live iFrame Rendering */}
+          <div className="w-[1280px] h-[800px] origin-top-left transform scale-[0.23] sm:scale-[0.24] md:scale-[0.25] pointer-events-none select-none bg-background">
+            <iframe
+              src={site.preview_url}
+              title={`${site.name} Preview`}
+              className="w-full h-full border-0 bg-background"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              loading="lazy"
+            />
+          </div>
 
-          {/* Visit Live Site */}
-          <a
-            href={site.preview_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-foreground text-xs transition-colors"
-            title="Open Live Website"
-          >
-            <ExternalLink className="size-3.5" />
-          </a>
+          {/* Subtle Hover Overlay */}
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 backdrop-blur-2xs">
+            <div className="px-2.5 py-1 rounded-md bg-background/90 text-foreground text-[11px] font-medium border border-border/80 flex items-center gap-1 shadow-md">
+              <Maximize2 className="size-3 text-primary" />
+              <span>Expand Preview</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 2. Sub Navigation Bar */}
+      {/* 2. Sub Navigation Bar (Content Sections) */}
       <div className="border-b border-border/80 flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -328,12 +355,12 @@ export const WebsiteControlCenter: React.FC<WebsiteControlCenterProps> = ({
         })}
       </div>
 
-      {/* 3. Main Content Panel */}
+      {/* 3. Main Content Editor Panel */}
       <div className="animate-in fade-in duration-150">
         {renderActiveTabContent()}
       </div>
 
-      {/* 4. Live Interactive Website Preview Modal */}
+      {/* 4. Fullscreen Interactive Preview Modal */}
       <LiveWebsitePreviewModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}

@@ -26,7 +26,7 @@ export const SeoPage: React.FC = () => {
           title="Indexed pages"
           value="100%"
           subValue="all pages indexed"
-          change="Live"
+          change="Synced"
           changeType="positive"
           icon={<Globe className="w-4 h-4 text-muted-foreground" />}
         />

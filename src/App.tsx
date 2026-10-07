@@ -27,6 +27,7 @@ import { CarePage } from './components/modules/care/CarePage';
 import { SupportPage } from './components/modules/support/SupportPage';
 import { SettingsPage } from './components/modules/settings/SettingsPage';
 import { TeamPage } from './components/modules/team/TeamPage';
+import { LoginPage } from './components/auth/LoginPage';
 import { dataService } from './services/dataService';
 import { Website } from './types';
 
@@ -39,11 +40,11 @@ const DashboardContent: React.FC = () => {
     isLoadingData,
     triggerDatabaseLoad,
   } = useTenant();
-  const { can } = useAuth();
+  const { can, isAuthenticated } = useAuth();
   const canViewBilling = can('billing.view');
 
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const [websiteSubTab, setWebsiteSubTab] = useState<string>('info');
+  const [websiteSubTab, setWebsiteSubTab] = useState<string>('homepage');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     return typeof window !== 'undefined' ? window.innerWidth < 1024 : false;
   });
@@ -82,7 +83,10 @@ const DashboardContent: React.FC = () => {
     }
 
     if (tabId === 'website-control') {
-      setWebsiteSubTab(subTab || 'info');
+      setWebsiteSubTab(subTab || 'homepage');
+    } else if (tabId === 'website-preview') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('homepage');
     } else if (tabId === 'website-content') {
       targetTab = 'website-control';
       setWebsiteSubTab('homepage');
@@ -224,12 +228,17 @@ const DashboardContent: React.FC = () => {
     }
   };
 
+  if (!isAuthenticated) {
+    return <LoginPage onSuccess={() => setActiveTab('overview')} />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-primary/20 selection:text-foreground">
       <div className="flex flex-1">
         {/* Sidebar */}
         <ShadcnSidebar
           activeTab={activeTab}
+          websiteSubTab={websiteSubTab}
           onSelectTab={handleNavigateTab}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -263,6 +272,7 @@ const DashboardContent: React.FC = () => {
       {/* Mobile Responsive Navigation & Drawer */}
       <MobileNav
         activeTab={activeTab}
+        websiteSubTab={websiteSubTab}
         onSelectTab={handleNavigateTab}
         pendingRequestsCount={pendingRequestsCount}
         isOpen={isMobileDrawerOpen}

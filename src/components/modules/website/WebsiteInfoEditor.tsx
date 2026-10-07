@@ -192,7 +192,7 @@ export const WebsiteInfoEditor: React.FC<WebsiteInfoEditorProps> = ({
               value={formData.business_name}
               onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
               className="w-full h-9 rounded-md bg-background border border-border px-3 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
-              placeholder="e.g. Lumina Health Group"
+              placeholder="e.g. Acme Studio or Your Business"
             />
           </div>
 

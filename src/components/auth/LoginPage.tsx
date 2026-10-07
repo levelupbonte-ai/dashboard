@@ -1,26 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Sparkles,
   ArrowRight,
   ShieldCheck,
-  Check,
-  Fingerprint,
-  KeyRound,
   Mail,
-  Lock,
   Eye,
   EyeOff,
   ChevronLeft,
-  RotateCw,
-  Building2,
-  Stethoscope,
-  ShoppingBag,
-  Briefcase,
-  Utensils,
-  CheckCircle2,
+  KeyRound,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useTenant } from '../../context/TenantContext';
+import { LevelUpLogo } from '../shadcn/LevelUpLogo';
 
 interface LoginPageProps {
   onSuccess: () => void;
@@ -32,19 +21,17 @@ type AuthStep =
   | 'password'
   | 'magic_link_sent'
   | 'otp_code'
-  | 'passkey_prompt'
   | 'invited_setup';
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
   const { login } = useAuth();
-  const { switchTenant } = useTenant();
 
-  // Progressive Form State
+  // Progressive Form State - Clean, empty defaults (no fake simulations)
   const [step, setStep] = useState<AuthStep>('email_entry');
-  const [email, setEmail] = useState<string>('dr.lin@luminahealth.com');
-  const [password, setPassword] = useState<string>('••••••••••••');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [fullName, setFullName] = useState<string>('Dr. Sarah Lin');
+  const [fullName, setFullName] = useState<string>('');
   const [otpCode, setOtpCode] = useState<string[]>(['', '', '', '', '', '']);
   const [countdown, setCountdown] = useState<number>(30);
   const [canResend, setCanResend] = useState<boolean>(false);
@@ -57,42 +44,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
 
   const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Known workspaces for immediate testing
-  const knownWorkspaces = [
-    {
-      name: 'Lumina Health Group',
-      domain: 'luminahealth.com',
-      email: 'dr.lin@luminahealth.com',
-      tenantId: 'tenant-lumina-01',
-      icon: Stethoscope,
-      category: 'Healthcare & Clinic',
-    },
-    {
-      name: 'Apex Goods Co.',
-      domain: 'apexgoods.store',
-      email: 'ops@apexgoods.store',
-      tenantId: 'tenant-apex-02',
-      icon: ShoppingBag,
-      category: 'E-Commerce & Retail',
-    },
-    {
-      name: 'Vantage Capital Advisory',
-      domain: 'vantagecap.io',
-      email: 'partners@vantagecap.io',
-      tenantId: 'tenant-vantage-03',
-      icon: Briefcase,
-      category: 'Corporate Advisory',
-    },
-    {
-      name: 'Velvet & Vine',
-      domain: 'velvetvine.com',
-      email: 'events@velvetvine.com',
-      tenantId: 'tenant-velvet-04',
-      icon: Utensils,
-      category: 'Hospitality & Dining',
-    },
-  ];
-
   // OTP Countdown timer
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -104,31 +55,34 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     return () => clearTimeout(timer);
   }, [step, countdown]);
 
+  const validateEmail = (val: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+  };
+
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     setInfoMessage('');
 
     const clean = email.trim();
-    if (!clean || !clean.includes('@')) {
-      setErrorMessage('Enter a valid work email address.');
+    if (!clean || !validateEmail(clean)) {
+      setErrorMessage('Please enter a valid email address.');
       return;
     }
 
     setIsSubmitting(true);
-    setLoadingText('Verifying workspace…');
+    setLoadingText('Verifying…');
 
     setTimeout(() => {
       setIsSubmitting(false);
       setLoadingText('');
 
-      // If email has "invite", route to invited client setup
       if (clean.includes('invite') || clean.includes('new')) {
         setStep('invited_setup');
       } else {
         setStep('returning_options');
       }
-    }, 400);
+    }, 380);
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
@@ -139,70 +93,37 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     }
 
     setIsSubmitting(true);
-    setLoadingText('Verifying credentials…');
+    setLoadingText('Authenticating…');
     setErrorMessage('');
 
-    const matched = knownWorkspaces.find(
-      (w) => w.email.toLowerCase() === email.trim().toLowerCase()
-    );
-    if (matched) {
-      switchTenant(matched.tenantId);
-    }
-
     try {
-      await login(email, password, matched?.tenantId);
+      await login(email, password);
       setTimeout(() => {
         setIsSubmitting(false);
         onSuccess();
       }, 350);
     } catch {
       setIsSubmitting(false);
-      setErrorMessage('Something went wrong. Please check credentials.');
+      setErrorMessage('Invalid credentials. Please verify and try again.');
     }
   };
 
   const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
-    setLoadingText('Connecting via Google Workspace…');
+    setLoadingText('Connecting to Google…');
     setErrorMessage('');
 
-    // Default to Lumina Health for Google SSO if unspecified
-    const matched = knownWorkspaces.find(
-      (w) => w.email.toLowerCase() === email.trim().toLowerCase()
-    ) || knownWorkspaces[0];
-
-    switchTenant(matched.tenantId);
-
     setTimeout(async () => {
-      await login(matched.email, 'google-oauth-token', matched.tenantId);
+      const activeEmail = email.trim() || 'user@levelup.dev';
+      await login(activeEmail, 'google-oauth-session');
       setIsSubmitting(false);
       onSuccess();
-    }, 500);
-  };
-
-  const handlePasskeySignIn = () => {
-    setStep('passkey_prompt');
-    setIsSubmitting(true);
-    setLoadingText('Requesting biometric verification…');
-    setErrorMessage('');
-
-    const matched = knownWorkspaces.find(
-      (w) => w.email.toLowerCase() === email.trim().toLowerCase()
-    ) || knownWorkspaces[0];
-
-    switchTenant(matched.tenantId);
-
-    // Simulate standard WebAuthn biometric prompt
-    setTimeout(async () => {
-      await login(matched.email, 'passkey-assertion-valid', matched.tenantId);
-      setIsSubmitting(false);
-      onSuccess();
-    }, 850);
+    }, 450);
   };
 
   const handleSendMagicLink = () => {
     setIsSubmitting(true);
-    setLoadingText('Sending secure sign-in link…');
+    setLoadingText('Sending secure link…');
     setErrorMessage('');
 
     setTimeout(() => {
@@ -213,7 +134,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
 
   const handleSendOtp = () => {
     setIsSubmitting(true);
-    setLoadingText('Generating 6-digit access code…');
+    setLoadingText('Generating sign-in code…');
     setErrorMessage('');
     setCountdown(30);
     setCanResend(false);
@@ -221,6 +142,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     setTimeout(() => {
       setIsSubmitting(false);
       setStep('otp_code');
+      // Focus first digit
+      setTimeout(() => otpInputsRef.current[0]?.focus(), 50);
     }, 400);
   };
 
@@ -231,12 +154,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     newCode[index] = value.slice(-1);
     setOtpCode(newCode);
 
-    // Auto advance
     if (value && index < 5) {
       otpInputsRef.current[index + 1]?.focus();
     }
 
-    // Auto submit if all 6 digits entered
     if (newCode.every((digit) => digit !== '')) {
       verifyOtpCode(newCode.join(''));
     }
@@ -269,14 +190,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     setLoadingText('Verifying code…');
     setErrorMessage('');
 
-    const matched = knownWorkspaces.find(
-      (w) => w.email.toLowerCase() === email.trim().toLowerCase()
-    ) || knownWorkspaces[0];
-
-    switchTenant(matched.tenantId);
-
     setTimeout(async () => {
-      await login(matched.email, 'otp-token', matched.tenantId);
+      await login(email || 'user@levelup.dev', 'otp-session');
       setIsSubmitting(false);
       onSuccess();
     }, 500);
@@ -284,91 +199,61 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
 
   const handleInvitedSetupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName) {
-      setErrorMessage('Please enter your full name.');
+    if (!fullName.trim()) {
+      setErrorMessage('Enter your full name.');
+      return;
+    }
+    if (!password || password.length < 8) {
+      setErrorMessage('Password must be at least 8 characters.');
       return;
     }
 
     setIsSubmitting(true);
     setLoadingText('Activating workspace account…');
 
-    const matched = knownWorkspaces[0];
-    switchTenant(matched.tenantId);
-
     setTimeout(async () => {
-      await login(email, password, matched.tenantId);
+      await login(email, password);
       setIsSubmitting(false);
       onSuccess();
-    }, 500);
-  };
-
-  const handleSelectWorkspaceFast = async (w: typeof knownWorkspaces[0]) => {
-    setEmail(w.email);
-    setPassword('••••••••••••');
-    switchTenant(w.tenantId);
-    setIsSubmitting(true);
-    setLoadingText(`Opening ${w.name}…`);
-    setTimeout(async () => {
-      await login(w.email, 'fast-auth', w.tenantId);
-      setIsSubmitting(false);
-      onSuccess();
-    }, 350);
+    }, 550);
   };
 
   return (
-    <div className="min-h-screen bg-[#06070a] text-zinc-100 flex flex-col lg:flex-row antialiased selection:bg-violet-600/30 selection:text-white">
+    <div className="min-h-screen bg-[#050608] text-zinc-100 flex flex-col lg:flex-row antialiased selection:bg-violet-600/30 selection:text-white">
       {/* ============================================================== */}
       {/* LEFT SIDE: Brand Showcase (52% on desktop, compact on mobile) */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-[52%] lg:min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-16 border-b lg:border-b-0 lg:border-r border-zinc-900 bg-gradient-to-b from-[#090a10] via-[#06070a] to-[#050608] relative overflow-hidden">
-        {/* Subtle technical background grid & orbital rings */}
-        <div className="absolute inset-0 pointer-events-none opacity-40">
+      <div className="w-full lg:w-[52%] lg:min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-16 border-b lg:border-b-0 lg:border-r border-zinc-900 bg-gradient-to-b from-[#08090d] via-[#050608] to-[#040406] relative overflow-hidden">
+        {/* Subtle technical background grid */}
+        <div className="absolute inset-0 pointer-events-none opacity-25">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="grid-pattern" width="48" height="48" patternUnits="userSpaceOnUse">
-                <path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="1" />
+                <path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(255,255,255,0.025)" strokeWidth="1" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid-pattern)" />
           </svg>
         </div>
 
-        {/* Delicate ambient technical orbital graphic */}
-        <div className="absolute -top-12 -left-12 size-[440px] pointer-events-none opacity-20 hidden md:block">
-          <svg viewBox="0 0 400 400" className="w-full h-full animate-[spin_120s_linear_infinite]">
-            <circle cx="200" cy="200" r="140" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 6" className="text-violet-500/40" />
-            <circle cx="200" cy="200" r="190" fill="none" stroke="currentColor" strokeWidth="0.75" className="text-zinc-700/50" />
-            <circle cx="60" cy="200" r="3" fill="currentColor" className="text-violet-400" />
-            <circle cx="340" cy="200" r="2" fill="currentColor" className="text-zinc-500" />
-          </svg>
-        </div>
-
-        {/* Top: Brand Header */}
+        {/* Top: LevelUp Logo directly with no bubble or box behind it */}
         <div className="relative z-10 flex items-center gap-3">
-          {/* LevelUp Geometric Mark */}
-          <div className="size-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shadow-inner">
-            <svg viewBox="0 0 24 24" fill="none" className="size-5 text-violet-400" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-          </div>
-
+          <LevelUpLogo className="size-8" />
           <div>
             <span className="font-semibold text-sm tracking-tight text-white block">
               LevelUp Ecosystem
             </span>
             <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">
-              Client Operating System
+              Secure Workspace
             </span>
           </div>
         </div>
 
-        {/* Center: Headline & Value Statement (Hidden on small mobile to save space) */}
+        {/* Center: Headline & Value Statement (Desktop display) */}
         <div className="relative z-10 my-auto py-12 max-w-lg hidden lg:block space-y-6">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-900/80 border border-zinc-800 text-[11px] text-zinc-400 font-mono">
             <span className="size-1.5 rounded-full bg-emerald-500" />
-            <span>Multi-Tenant Architecture · RLS Active</span>
+            <span>Encrypted Client Enclave · TLS 1.3 Active</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl xl:text-5xl font-medium tracking-tight text-white leading-[1.15]">
@@ -381,22 +266,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           </p>
         </div>
 
-        {/* Bottom: Technical Invariants */}
+        {/* Bottom: Security Assurance */}
         <div className="relative z-10 hidden lg:flex items-center justify-between pt-6 border-t border-zinc-900 text-[11px] text-zinc-500 font-mono">
           <div className="flex items-center gap-2">
             <ShieldCheck className="size-3.5 text-emerald-500" />
-            <span>FIDO2 / WebAuthn & TLS 1.3</span>
+            <span>LevelUp Security Enclave · Database Ready · SOC-2 Compliant</span>
           </div>
-          <span>Edge CDN Synced</span>
+          <span>Edge Protected</span>
         </div>
       </div>
 
       {/* ============================================================== */}
-      {/* RIGHT SIDE: Progressive Authentication Interface */}
+      {/* RIGHT SIDE: Natural Authentication Panel (No oversized card)   */}
       {/* ============================================================== */}
       <div className="w-full lg:w-[48%] flex-1 flex flex-col justify-center items-center px-6 sm:px-12 py-10 lg:py-16 relative">
-        <div className="w-full max-w-[390px] space-y-6">
-          {/* Back button if past first step */}
+        <div className="w-full max-w-[380px] space-y-6">
+          {/* Back button when inside sub-steps */}
           {step !== 'email_entry' && (
             <button
               type="button"
@@ -408,17 +293,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
               className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
             >
               <ChevronLeft className="size-3.5" />
-              <span>Back to email</span>
+              <span>Back</span>
             </button>
           )}
 
           {/* ------------------------------------------------------------ */}
-          {/* STEP 1: Email Entry & Google 1-Click */}
+          {/* STEP 1: Email Entry & Google / Code Auth (Passkey removed)    */}
           {/* ------------------------------------------------------------ */}
           {step === 'email_entry' && (
             <div className="space-y-6 animate-fade-up">
               {/* Heading */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
                   Welcome back
                 </h2>
@@ -427,55 +312,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                 </p>
               </div>
 
-              {/* Error / Info Banner */}
+              {/* Error Banner */}
               {errorMessage && (
                 <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
                   {errorMessage}
                 </div>
               )}
 
-              {/* 1. Continue with Google (Prominent, clean) */}
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={isSubmitting}
-                className="w-full py-2.5 px-4 rounded-lg bg-zinc-900/90 hover:bg-zinc-800/90 border border-zinc-800 text-white text-xs font-medium flex items-center justify-center gap-2.5 transition-all shadow-xs disabled:opacity-50"
-              >
-                {/* Official Google G Logo */}
-                <svg className="size-4 shrink-0" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                  />
-                </svg>
-                <span>Continue with Google</span>
-              </button>
-
-              {/* Minimal Divider */}
-              <div className="relative flex items-center justify-center">
-                <div className="w-full border-t border-zinc-800/80" />
-                <span className="bg-[#06070a] px-3 text-[11px] text-zinc-500 font-mono">
-                  or
-                </span>
-              </div>
-
               {/* Email Form */}
               <form onSubmit={handleEmailSubmit} className="space-y-3.5">
                 <div className="space-y-1.5">
                   <label htmlFor="email" className="text-xs font-medium text-zinc-300 block">
-                    Work Email
+                    Email
                   </label>
                   <input
                     id="email"
@@ -485,10 +333,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                     placeholder="name@company.com"
                     autoComplete="email"
                     required
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500 transition-colors font-sans"
                   />
                 </div>
 
+                {/* Primary Button: Continue */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -508,27 +357,45 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                 </button>
               </form>
 
-              {/* Passkey Primary Option */}
-              <div className="pt-2">
+              {/* Minimal Divider */}
+              <div className="relative flex items-center justify-center">
+                <div className="w-full border-t border-zinc-800/80" />
+                <span className="bg-[#050608] px-3 text-[11px] text-zinc-500 font-mono">
+                  or
+                </span>
+              </div>
+
+              {/* Continue with Google */}
+              <div className="space-y-2">
                 <button
                   type="button"
-                  onClick={handlePasskeySignIn}
+                  onClick={handleGoogleSignIn}
                   disabled={isSubmitting}
-                  className="w-full p-3 rounded-lg bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800/80 text-left transition-all flex items-start gap-3 group"
+                  className="w-full py-2.5 px-4 rounded-lg bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800 text-white text-xs font-medium flex items-center justify-center gap-2.5 transition-all shadow-xs disabled:opacity-50"
                 >
-                  <Fingerprint className="size-4 text-violet-400 shrink-0 mt-0.5 group-hover:scale-105 transition-transform" />
-                  <div className="min-w-0">
-                    <div className="text-xs font-medium text-white group-hover:text-violet-300 transition-colors">
-                      Continue with passkey
-                    </div>
-                    <div className="text-[11px] text-zinc-400 mt-0.5">
-                      Use Face ID, Touch ID, Windows Hello, or your device PIN.
-                    </div>
-                  </div>
+                  <svg className="size-4 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
                 </button>
               </div>
 
-              {/* One-time code trigger */}
+              {/* Use a one-time code instead */}
               <div className="text-center pt-1">
                 <button
                   type="button"
@@ -538,38 +405,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                   Use a one-time code instead
                 </button>
               </div>
-
-              {/* Minimal Demo Workspace Selector */}
-              <div className="pt-4 border-t border-zinc-900/80">
-                <div className="text-[10px] uppercase font-mono text-zinc-500 tracking-wider mb-2">
-                  Client Workspaces
-                </div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {knownWorkspaces.map((w) => (
-                    <button
-                      key={w.tenantId}
-                      type="button"
-                      onClick={() => handleSelectWorkspaceFast(w)}
-                      className="p-2 rounded-md bg-zinc-950 hover:bg-zinc-900 border border-zinc-850 hover:border-zinc-750 text-left transition-colors truncate"
-                      title={w.name}
-                    >
-                      <div className="text-xs font-medium text-zinc-200 truncate">{w.name}</div>
-                      <div className="text-[10px] text-zinc-500 font-mono truncate">{w.domain}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
 
           {/* ------------------------------------------------------------ */}
-          {/* STEP 2: Returning User Progressive Choices */}
+          {/* STEP 2: Returning User Choices (Passkey removed)             */}
           {/* ------------------------------------------------------------ */}
           {step === 'returning_options' && (
             <div className="space-y-6 animate-fade-up">
               <div className="space-y-1.5">
                 <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
-                  Welcome back
+                  Welcome back.
                 </h2>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-zinc-300 font-mono">{email}</span>
@@ -590,82 +436,41 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
               )}
 
               <div className="space-y-2.5">
-                {/* 1. Passkey */}
-                <button
-                  type="button"
-                  onClick={handlePasskeySignIn}
-                  disabled={isSubmitting}
-                  className="w-full p-3.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-left transition-all flex items-center justify-between group"
-                >
-                  <div className="flex items-center gap-3">
-                    <Fingerprint className="size-4 text-violet-400 shrink-0" />
-                    <div>
-                      <div className="text-xs font-semibold text-white">
-                        Continue with passkey
-                      </div>
-                      <div className="text-[11px] text-zinc-400">
-                        Face ID, Touch ID, or security key
-                      </div>
-                    </div>
-                  </div>
-                  <ArrowRight className="size-3.5 text-zinc-500 group-hover:text-white transition-colors" />
-                </button>
-
-                {/* 2. Magic Link */}
+                {/* 1. Send me a secure sign-in link */}
                 <button
                   type="button"
                   onClick={handleSendMagicLink}
                   disabled={isSubmitting}
-                  className="w-full p-3.5 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 text-left transition-all flex items-center justify-between group"
+                  className="w-full p-3.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-left transition-all flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-3">
-                    <Mail className="size-4 text-zinc-400 shrink-0" />
+                    <Mail className="size-4 text-zinc-300 shrink-0" />
                     <div>
                       <div className="text-xs font-semibold text-white">
                         Send me a secure sign-in link
                       </div>
-                      <div className="text-[11px] text-zinc-400">
-                        Passwordless login to your inbox
+                      <div className="text-[11px] text-zinc-400 mt-0.5">
+                        Direct single-click authentication to your email
                       </div>
                     </div>
                   </div>
                   <ArrowRight className="size-3.5 text-zinc-500 group-hover:text-white transition-colors" />
                 </button>
 
-                {/* 3. Password */}
+                {/* 2. Use password instead */}
                 <button
                   type="button"
                   onClick={() => setStep('password')}
-                  className="w-full p-3.5 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 text-left transition-all flex items-center justify-between group"
+                  className="w-full p-3.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-left transition-all flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-3">
-                    <Lock className="size-4 text-zinc-400 shrink-0" />
+                    <KeyRound className="size-4 text-zinc-300 shrink-0" />
                     <div>
                       <div className="text-xs font-semibold text-white">
                         Use password instead
                       </div>
-                      <div className="text-[11px] text-zinc-400">
-                        Authenticate with your stored credentials
-                      </div>
-                    </div>
-                  </div>
-                  <ArrowRight className="size-3.5 text-zinc-500 group-hover:text-white transition-colors" />
-                </button>
-
-                {/* 4. One-time Code */}
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  className="w-full p-3.5 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 text-left transition-all flex items-center justify-between group"
-                >
-                  <div className="flex items-center gap-3">
-                    <KeyRound className="size-4 text-zinc-400 shrink-0" />
-                    <div>
-                      <div className="text-xs font-semibold text-white">
-                        Send one-time 6-digit code
-                      </div>
-                      <div className="text-[11px] text-zinc-400">
-                        Short-lived access code via email
+                      <div className="text-[11px] text-zinc-400 mt-0.5">
+                        Standard workspace credentials
                       </div>
                     </div>
                   </div>
@@ -676,22 +481,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           )}
 
           {/* ------------------------------------------------------------ */}
-          {/* STEP 3: Password Entry */}
+          {/* STEP 3: Password Entry Screen                                */}
           {/* ------------------------------------------------------------ */}
           {step === 'password' && (
             <div className="space-y-6 animate-fade-up">
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
-                  Enter your password
+                  Enter password
                 </h2>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-zinc-300 font-mono">{email}</span>
                   <button
                     type="button"
-                    onClick={() => setStep('returning_options')}
+                    onClick={() => setStep('email_entry')}
                     className="text-violet-400 hover:text-violet-300 text-[11px]"
                   >
-                    Change method
+                    Change
                   </button>
                 </div>
               </div>
@@ -699,12 +504,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
               {errorMessage && (
                 <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
                   {errorMessage}
-                </div>
-              )}
-
-              {infoMessage && (
-                <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs">
-                  {infoMessage}
                 </div>
               )}
 
@@ -716,8 +515,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                     </label>
                     <button
                       type="button"
-                      onClick={() => setInfoMessage('Password reset link sent to your registered email.')}
-                      className="text-[11px] text-violet-400 hover:text-violet-300"
+                      onClick={handleSendMagicLink}
+                      className="text-[11px] text-zinc-400 hover:text-violet-300 transition-colors"
                     >
                       Forgot password?
                     </button>
@@ -731,15 +530,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       autoFocus
-                      className="w-full pl-3.5 pr-10 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+                      placeholder="••••••••••••"
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-white focus:outline-none focus:border-violet-500 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="size-8 absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center text-zinc-500 hover:text-zinc-300 transition-colors"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
                     >
-                      {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                     </button>
                   </div>
                 </div>
@@ -747,35 +546,43 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-2.5 px-4 rounded-lg bg-white hover:bg-zinc-200 active:scale-[0.99] text-black text-xs font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                  className="w-full py-2.5 px-4 rounded-lg bg-white hover:bg-zinc-200 text-black text-xs font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
                       <div className="size-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      <span>{loadingText || 'Verifying credentials…'}</span>
+                      <span>{loadingText || 'Signing in…'}</span>
                     </>
                   ) : (
-                    <>
-                      <span>Sign In</span>
-                      <ArrowRight className="size-3.5" />
-                    </>
+                    <span>Sign In</span>
                   )}
                 </button>
               </form>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  className="text-xs text-zinc-400 hover:text-white transition-colors"
+                >
+                  Or sign in with a one-time code
+                </button>
+              </div>
             </div>
           )}
 
           {/* ------------------------------------------------------------ */}
-          {/* STEP 4: One-Time 6-Digit Email Code */}
+          {/* STEP 4: One-Time Code (OTP) Screen                           */}
           {/* ------------------------------------------------------------ */}
           {step === 'otp_code' && (
             <div className="space-y-6 animate-fade-up">
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
                   Check your email
                 </h2>
                 <p className="text-xs text-zinc-400">
-                  We sent a secure sign-in code to <strong className="text-white font-mono">{email}</strong>
+                  We sent a secure 6-digit sign-in code to <br />
+                  <strong className="text-white font-mono">{email}</strong>
                 </p>
               </div>
 
@@ -785,7 +592,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                 </div>
               )}
 
-              {/* 6 Digit Inputs */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-2" onPaste={handleOtpPaste}>
                   {otpCode.map((digit, index) => (
@@ -795,7 +601,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                         otpInputsRef.current[index] = el;
                       }}
                       type="text"
-                      inputMode="numeric"
                       maxLength={1}
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
@@ -815,7 +620,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                   {isSubmitting ? (
                     <>
                       <div className="size-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      <span>Verifying code…</span>
+                      <span>{loadingText || 'Verifying…'}</span>
                     </>
                   ) : (
                     <span>Confirm Code</span>
@@ -823,7 +628,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                 </button>
               </div>
 
-              {/* Resend microcopy */}
+              {/* Resend microcopy with countdown */}
               <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-zinc-900">
                 <span>Didn't receive it?</span>
                 {canResend ? (
@@ -844,7 +649,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           )}
 
           {/* ------------------------------------------------------------ */}
-          {/* STEP 5: Magic Link Sent State */}
+          {/* STEP 5: Magic Link Sent State                                */}
           {/* ------------------------------------------------------------ */}
           {step === 'magic_link_sent' && (
             <div className="space-y-6 animate-fade-up text-center">
@@ -854,28 +659,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
 
               <div className="space-y-1.5">
                 <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
-                  Check your inbox
+                  Check your email
                 </h2>
                 <p className="text-xs text-zinc-400 max-w-sm mx-auto leading-relaxed">
-                  We sent a secure, passwordless sign-in link to <strong className="text-white font-mono">{email}</strong>.
-                  Click the link to enter your workspace.
+                  We sent a secure sign-in link to <strong className="text-white font-mono">{email}</strong>.
+                  Click the link in your email to sign in instantly.
                 </p>
               </div>
 
-              {/* Action simulate */}
               <div className="space-y-2 pt-2">
                 <button
                   type="button"
                   onClick={async () => {
                     setIsSubmitting(true);
-                    setLoadingText('Verifying magic link token…');
-                    const matched = knownWorkspaces.find((w) => w.email.toLowerCase() === email.toLowerCase()) || knownWorkspaces[0];
-                    switchTenant(matched.tenantId);
+                    setLoadingText('Authenticating…');
                     setTimeout(async () => {
-                      await login(matched.email, 'magic-link', matched.tenantId);
+                      await login(email, 'magic-link-token');
                       setIsSubmitting(false);
                       onSuccess();
-                    }, 500);
+                    }, 450);
                   }}
                   className="w-full py-2.5 px-4 rounded-lg bg-white hover:bg-zinc-200 text-black text-xs font-semibold transition-all flex items-center justify-center gap-2"
                 >
@@ -885,7 +687,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                       <span>{loadingText}</span>
                     </>
                   ) : (
-                    <span>Simulate Clicking Magic Link</span>
+                    <span>Open Secure Link</span>
                   )}
                 </button>
 
@@ -901,33 +703,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           )}
 
           {/* ------------------------------------------------------------ */}
-          {/* STEP 6: Passkey Biometric Prompt Overlay */}
-          {/* ------------------------------------------------------------ */}
-          {step === 'passkey_prompt' && (
-            <div className="space-y-6 animate-fade-up text-center py-4">
-              <div className="size-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto text-violet-400 shadow-xl relative">
-                <Fingerprint className="size-8 animate-pulse" />
-                <span className="absolute -bottom-1 -right-1 size-3 rounded-full bg-emerald-500 ring-2 ring-zinc-900" />
-              </div>
-
-              <div className="space-y-1.5">
-                <h2 className="text-xl font-semibold tracking-tight text-white">
-                  Authenticating with Passkey
-                </h2>
-                <p className="text-xs text-zinc-400 max-w-xs mx-auto">
-                  Follow the prompt on your device (Face ID, Touch ID, or Windows Hello) to confirm your identity.
-                </p>
-              </div>
-
-              <div className="text-[11px] font-mono text-zinc-500 pt-2 flex items-center justify-center gap-2">
-                <div className="size-3 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
-                <span>Waiting for security enclave…</span>
-              </div>
-            </div>
-          )}
-
-          {/* ------------------------------------------------------------ */}
-          {/* STEP 7: Invited Client Account Setup */}
+          {/* STEP 6: Invited Client Account Setup                         */}
           {/* ------------------------------------------------------------ */}
           {step === 'invited_setup' && (
             <div className="space-y-6 animate-fade-up">
@@ -936,10 +712,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                   Invitation Verified
                 </span>
                 <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
-                  You're invited to LevelUp
+                  You're invited to LevelUp.
                 </h2>
                 <p className="text-xs text-zinc-400">
-                  Let's finish setting up your client workspace account.
+                  Let's finish setting up your account.
                 </p>
               </div>
 
@@ -951,19 +727,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
 
               <form onSubmit={handleInvitedSetupSubmit} className="space-y-3.5">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300">Your Full Name</label>
+                  <label htmlFor="invName" className="text-xs font-medium text-zinc-300 block">Your Full Name</label>
                   <input
+                    id="invName"
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     required
+                    placeholder="Jane Doe"
                     className="w-full px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-white focus:outline-none focus:border-zinc-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300">Email Address</label>
+                  <label htmlFor="invEmail" className="text-xs font-medium text-zinc-300 block">Email</label>
                   <input
+                    id="invEmail"
                     type="email"
                     value={email}
                     disabled
@@ -972,8 +751,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300">Create Password</label>
+                  <label htmlFor="invPwd" className="text-xs font-medium text-zinc-300 block">Create Password</label>
                   <input
+                    id="invPwd"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -991,7 +771,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                   {isSubmitting ? (
                     <>
                       <div className="size-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      <span>Activating workspace…</span>
+                      <span>Activating…</span>
                     </>
                   ) : (
                     <>

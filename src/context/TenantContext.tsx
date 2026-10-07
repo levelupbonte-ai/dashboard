@@ -23,7 +23,9 @@ const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
 export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [tenants, setTenants] = useState<Tenant[]>(() => dataService.getAllTenants());
-  const [currentTenantId, setCurrentTenantId] = useState<string>('tenant-lumina-01');
+  const [currentTenantId, setCurrentTenantId] = useState<string>(
+    () => dataService.getAllTenants()[0]?.id || 'tenant-main'
+  );
   const [websites, setWebsites] = useState<Website[]>([]);
   const [activeWebsite, setActiveWebsite] = useState<Website | null>(null);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);

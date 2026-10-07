@@ -16,7 +16,28 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ activeTab }) => {
       case 'overview':
         return 'Overview';
       case 'websites':
-        return 'My websites';
+      case 'website-control':
+        return 'Website Control';
+      case 'website-content':
+        return 'Homepage & Pages';
+      case 'website-media':
+        return 'Media Library';
+      case 'website-menu':
+        return 'Food & Wine Menu';
+      case 'website-services':
+        return 'Services';
+      case 'website-products':
+        return 'Products & Store';
+      case 'website-team':
+        return 'Team & Staff';
+      case 'website-gallery':
+        return 'Photo Gallery';
+      case 'website-announcements':
+        return 'Announcements';
+      case 'website-blog':
+        return 'Articles & Journal';
+      case 'inventory':
+        return 'Inventory';
       case 'performance':
         return 'Website performance';
       case 'requests':

@@ -2,8 +2,15 @@ import React from 'react';
 import {
   LayoutDashboard,
   Globe,
-  FileCode2,
-  Users2,
+  FileText,
+  Image as ImageIcon,
+  Utensils,
+  Briefcase,
+  ShoppingBag,
+  Users,
+  Camera,
+  Megaphone,
+  BookOpen,
   Menu,
   X,
   CreditCard,
@@ -11,10 +18,15 @@ import {
   LifeBuoy,
   Settings,
   CalendarDays,
-  ShoppingBag,
   LineChart,
   SearchCode,
   UserCheck,
+  Package,
+  Boxes,
+  MessageSquare,
+  Users2,
+  Gauge,
+  FileCode2,
 } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
 import { useAuth } from '../../context/AuthContext';
@@ -23,6 +35,9 @@ import { LevelUpLogo } from '../shadcn/LevelUpLogo';
 import { ThemeSelector } from '../shadcn/ThemeSelector';
 import { ThemeModeToggle } from '../shadcn/ThemeModeToggle';
 import { cn } from '../../lib/utils';
+import { generateDashboardEngineConfig } from '../../lib/dashboardEngine';
+import { dataService } from '../../services/dataService';
+import { websiteDataService } from '../../services/websiteDataService';
 
 interface MobileNavProps {
   activeTab: string;
@@ -36,87 +51,96 @@ interface MobileNavProps {
 export const MobileNav: React.FC<MobileNavProps> = ({
   activeTab,
   onSelectTab,
-  pendingRequestsCount,
   isOpen,
   onClose,
   onOpen,
 }) => {
-  const { currentTenant, hasBookings, hasEcommerce, hasSeo, hasCarePlan } = useTenant();
-  const { can } = useAuth();
+  const { currentTenant, activeWebsite, websites } = useTenant();
+  const { orgRole } = useAuth();
 
-  const canViewBilling = can('billing.view');
-  const isMedical = currentTenant.slug === 'lumina-health';
-  const isHospitality = currentTenant.slug === 'velvet-vine';
+  const site = activeWebsite || websites[0];
+  const bookings = dataService.getBookings(currentTenant.id);
+  const leads = dataService.getLeads(currentTenant.id);
+  const requests = dataService.getRequests(currentTenant.id);
+  const orders = dataService.getStoreOrders(currentTenant.id);
 
-  const enquiriesLabel = isMedical ? 'Patient enquiries' : 'New enquiries';
-  const bookingsLabel = isHospitality ? 'Reservations' : 'Appointments';
+  const products = site ? websiteDataService.getProducts(site.id) : [];
+  const lowStock = products.filter((p) => p.inventory_count <= p.low_stock_threshold);
+  const announcements = site ? websiteDataService.getAnnouncements(site.id) : [];
+  const draftAnnouncements = announcements.filter((a) => a.status === 'draft');
+
+  const engine = generateDashboardEngineConfig(currentTenant, site, orgRole, {
+    pendingBookingsCount: bookings.filter((b) => b.status === 'pending').length,
+    upcomingBookingsCount: bookings.filter((b) => b.status !== 'cancelled').length,
+    openRequestsCount: requests.filter((r) => r.status !== 'completed').length,
+    newLeadsCount: leads.filter((l) => l.status === 'new').length,
+    storeOrdersCount: orders.length,
+    lowStockItemsCount: lowStock.length,
+    draftAnnouncementsCount: draftAnnouncements.length,
+    totalVisitors: site ? site.visitors_30d : 12480,
+  });
+
+  const getIconComponent = (name: string) => {
+    switch (name) {
+      case 'LayoutDashboard':
+        return LayoutDashboard;
+      case 'Globe':
+        return Globe;
+      case 'FileText':
+        return FileText;
+      case 'Image':
+        return ImageIcon;
+      case 'Utensils':
+        return Utensils;
+      case 'Briefcase':
+        return Briefcase;
+      case 'ShoppingBag':
+        return ShoppingBag;
+      case 'Users':
+        return Users;
+      case 'Camera':
+        return Camera;
+      case 'Megaphone':
+        return Megaphone;
+      case 'BookOpen':
+        return BookOpen;
+      case 'CalendarDays':
+        return CalendarDays;
+      case 'Users2':
+        return Users2;
+      case 'Package':
+        return Package;
+      case 'Boxes':
+        return Boxes;
+      case 'MessageSquare':
+        return MessageSquare;
+      case 'LineChart':
+        return LineChart;
+      case 'SearchCode':
+        return SearchCode;
+      case 'Gauge':
+        return Gauge;
+      case 'FileCode2':
+        return FileCode2;
+      case 'CreditCard':
+        return CreditCard;
+      case 'ShieldCheck':
+        return ShieldCheck;
+      case 'UserCheck':
+        return UserCheck;
+      case 'LifeBuoy':
+        return LifeBuoy;
+      case 'Settings':
+      default:
+        return Settings;
+    }
+  };
 
   const primaryTabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'websites', label: 'Websites', icon: Globe },
-    {
-      id: 'requests',
-      label: 'Requests',
-      icon: FileCode2,
-    },
+    { id: 'website-control', label: 'Website', icon: Globe },
+    { id: 'requests', label: 'Requests', icon: FileCode2 },
     { id: 'team', label: 'Team', icon: UserCheck },
-  ];
-
-  const sections = [
-    {
-      title: 'OVERVIEW & WEBSITE',
-      items: [
-        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-        { id: 'websites', label: 'My websites', icon: Globe },
-        {
-          id: 'requests',
-          label: 'Open requests',
-          icon: FileCode2,
-        },
-      ],
-    },
-    {
-      title: 'BUSINESS',
-      items: [
-        { id: 'leads', label: enquiriesLabel, icon: Users2 },
-        ...(hasBookings
-          ? [{ id: 'bookings', label: bookingsLabel, icon: CalendarDays }]
-          : []),
-        ...(hasEcommerce
-          ? [{ id: 'store', label: 'Orders', icon: ShoppingBag }]
-          : []),
-      ],
-    },
-    {
-      title: 'PERFORMANCE & TEAM',
-      items: [
-        { id: 'analytics', label: 'Website traffic', icon: LineChart },
-        ...(hasSeo
-          ? [{ id: 'seo', label: 'Search visibility', icon: SearchCode }]
-          : []),
-        { id: 'team', label: 'Team', icon: UserCheck },
-      ],
-    },
-    ...(canViewBilling
-      ? [
-          {
-            title: 'BILLING',
-            items: [
-              { id: 'billing', label: 'Billing', icon: CreditCard },
-              ...(hasCarePlan
-                ? [{ id: 'care', label: 'Subscription', icon: ShieldCheck }]
-                : []),
-            ],
-          },
-        ]
-      : []),
-    {
-      title: 'ACCOUNT',
-      items: [
-        { id: 'support', label: 'Support', icon: LifeBuoy },
-        { id: 'settings', label: 'Settings', icon: Settings },
-      ],
-    },
   ];
 
   return (
@@ -125,7 +149,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({
       <nav className="md:hidden fixed bottom-0 inset-x-0 h-14 bg-background/95 backdrop-blur-md border-t border-border px-1 flex items-center justify-around z-40 select-none pb-safe">
         {primaryTabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const isActive =
+            activeTab === tab.id ||
+            (tab.id === 'website-control' && activeTab.startsWith('website-'));
           return (
             <button
               key={tab.id}
@@ -176,7 +202,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                     {currentTenant.name}
                   </div>
                   <div className="text-[11px] text-muted-foreground capitalize">
-                    {currentTenant.care_plan} plan
+                    {engine.businessCategoryName}
                   </div>
                 </div>
               </div>
@@ -203,15 +229,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               <OrgSwitcher isCollapsed={false} />
             </div>
 
-            {/* Navigation Groups */}
+            {/* Dynamic Navigation Groups from Engine */}
             <div className="flex-1 overflow-y-auto py-3 space-y-4 scrollbar-none">
-              {sections.map((section, sIdx) => (
+              {engine.navGroups.map((section, sIdx) => (
                 <div key={sIdx} className="space-y-0.5">
                   <div className="px-2 py-1 text-[10px] font-mono font-medium uppercase tracking-wider text-muted-foreground">
-                    {section.title}
+                    {section.label}
                   </div>
                   {section.items.map((item) => {
-                    const Icon = item.icon;
+                    const Icon = getIconComponent(item.icon);
                     const isActive = activeTab === item.id;
                     return (
                       <button
@@ -234,8 +260,14 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                               isActive ? 'text-foreground' : 'text-muted-foreground'
                             )}
                           />
-                          <span className="truncate">{item.label}</span>
+                          <span className="truncate">{item.title}</span>
                         </div>
+
+                        {item.badge !== undefined && (
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border">
+                            {item.badge}
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -246,7 +278,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             {/* Footer */}
             <div className="pt-3 border-t border-border text-xs text-muted-foreground flex items-center justify-between">
               <span>{currentTenant.name}</span>
-              <span className="text-emerald-500 font-medium text-xs">Online</span>
+              <span className="text-emerald-500 font-medium text-xs">Website Live</span>
             </div>
           </div>
         </div>

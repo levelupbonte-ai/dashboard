@@ -25,18 +25,18 @@ export const ShadcnHeader: React.FC<ShadcnHeaderProps> = ({
 
   return (
     <header className="h-14 border-b border-border/50 bg-background/85 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-3 sticky top-0 z-30 shrink-0">
-      {/* Left: Sidebar trigger + Breadcrumb Trail */}
+      {/* Left: Sidebar trigger (Desktop/Tablet) + Breadcrumb Trail */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={onToggleSidebar}
-          className="size-8 rounded-md text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center shrink-0"
+          className="hidden md:flex size-8 rounded-md text-muted-foreground hover:text-foreground transition-colors items-center justify-center shrink-0"
           title="Toggle Sidebar"
           aria-label="Toggle Sidebar"
         >
           <PanelLeft className="size-4" />
         </button>
 
-        <div className="h-4 w-px bg-border/50 hidden sm:block" />
+        <div className="h-4 w-px bg-border/50 hidden md:block" />
 
         <Breadcrumbs activeTab={activeTab} />
       </div>

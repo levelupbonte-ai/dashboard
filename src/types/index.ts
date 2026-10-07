@@ -34,6 +34,352 @@ export type Permission =
 
 export type CarePlanTier = 'none' | 'essential' | 'pro' | 'premium';
 
+export type WebsiteType =
+  | 'restaurant'
+  | 'clinic'
+  | 'ecommerce'
+  | 'corporate'
+  | 'portfolio'
+  | 'event';
+
+export type WebsiteFeature =
+  | 'information'
+  | 'homepage'
+  | 'media'
+  | 'services'
+  | 'menu'
+  | 'products'
+  | 'bookings'
+  | 'team'
+  | 'gallery'
+  | 'announcements'
+  | 'events'
+  | 'blog'
+  | 'faqs'
+  | 'navigation'
+  | 'seo'
+  | 'analytics'
+  | 'requests'
+  | 'inventory'
+  | 'discounts';
+
+export type ContentStatus = 'published' | 'draft' | 'archived';
+
+export interface WebsiteConfig {
+  website_type: WebsiteType;
+  features: WebsiteFeature[];
+  homepage_modules: string[];
+  currency: string;
+  timezone: string;
+}
+
+export interface DayHours {
+  open: string;
+  close: string;
+  is_closed: boolean;
+}
+
+export interface WebsiteInformation {
+  website_id: string;
+  business_name: string;
+  tagline: string;
+  description: string;
+  phone: string;
+  email: string;
+  address: string;
+  city: string;
+  postal_code: string;
+  country: string;
+  opening_hours: Record<string, DayHours>;
+  social_links: {
+    instagram?: string;
+    facebook?: string;
+    linkedin?: string;
+    twitter?: string;
+    google_maps?: string;
+  };
+  logo_url: string;
+  favicon_url: string;
+  seo_title: string;
+  seo_description: string;
+  og_image_url: string;
+  updated_at: string;
+  updated_by: string;
+}
+
+export interface HomepageContent {
+  website_id: string;
+  hero_badge: string;
+  hero_headline: string;
+  hero_description: string;
+  primary_cta_label: string;
+  primary_cta_link: string;
+  secondary_cta_label: string;
+  secondary_cta_link: string;
+  hero_image_url: string;
+  announcement_banner_active: boolean;
+  announcement_banner_text: string;
+  featured_services_enabled: boolean;
+  featured_products_enabled: boolean;
+  testimonials_enabled: boolean;
+  gallery_preview_enabled: boolean;
+  faq_section_enabled: boolean;
+  updated_at: string;
+  updated_by: string;
+}
+
+export interface MediaItem {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  name: string;
+  url: string;
+  category: 'heroes' | 'gallery' | 'services' | 'products' | 'team' | 'brand';
+  size_kb: number;
+  mime_type: string;
+  alt_text: string;
+  caption?: string;
+  created_at: string;
+  created_by: string;
+}
+
+export interface WebsiteService {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  name: string;
+  slug: string;
+  category: string;
+  description: string;
+  price: number;
+  duration_minutes: number;
+  image_url?: string;
+  is_booking_enabled: boolean;
+  is_featured: boolean;
+  status: ContentStatus;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WebsiteMenuCategory {
+  id: string;
+  website_id: string;
+  name: string;
+  description?: string;
+  sort_order: number;
+}
+
+export interface WebsiteMenuItem {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  category_id: string;
+  category_name: string;
+  name: string;
+  description: string;
+  price: number;
+  image_url?: string;
+  dietary: ('vegetarian' | 'vegan' | 'gluten_free' | 'chef_special')[];
+  is_available: boolean;
+  is_featured: boolean;
+  sort_order: number;
+  status: ContentStatus;
+  updated_at: string;
+}
+
+export interface WebsiteProduct {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  name: string;
+  slug: string;
+  sku: string;
+  category: string;
+  description: string;
+  price: number;
+  compare_at_price?: number;
+  inventory_count: number;
+  track_inventory: boolean;
+  low_stock_threshold: number;
+  image_url: string;
+  is_featured: boolean;
+  status: ContentStatus;
+  variants_count?: number;
+  updated_at: string;
+}
+
+export interface WebsiteTeamMember {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  name: string;
+  role: string;
+  bio: string;
+  photo_url: string;
+  email?: string;
+  phone?: string;
+  specialties: string[];
+  sort_order: number;
+  status: ContentStatus;
+  updated_at: string;
+}
+
+export interface WebsiteGalleryItem {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  title: string;
+  image_url: string;
+  category: string;
+  caption?: string;
+  alt_text: string;
+  sort_order: number;
+  status: ContentStatus;
+  updated_at: string;
+}
+
+export interface WebsiteAnnouncement {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  title: string;
+  message: string;
+  badge_label: string;
+  badge_type: 'notice' | 'offer' | 'update' | 'alert';
+  link_url?: string;
+  link_label?: string;
+  starts_at?: string;
+  ends_at?: string;
+  status: ContentStatus;
+  updated_at: string;
+}
+
+export interface WebsiteEvent {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  title: string;
+  slug: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  cover_image: string;
+  rsvp_url?: string;
+  ticket_url?: string;
+  capacity?: number;
+  rsvp_count: number;
+  status: ContentStatus;
+  updated_at: string;
+}
+
+export interface WebsiteBlogPost {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featured_image: string;
+  author_name: string;
+  author_avatar?: string;
+  category: string;
+  tags: string[];
+  read_time_minutes: number;
+  seo_title: string;
+  seo_description: string;
+  status: ContentStatus;
+  published_at: string;
+  updated_at: string;
+}
+
+export interface WebsiteFaq {
+  id: string;
+  website_id: string;
+  organization_id: string;
+  question: string;
+  answer: string;
+  category: string;
+  sort_order: number;
+  status: ContentStatus;
+  updated_at: string;
+}
+
+export interface WebsiteNavItem {
+  id: string;
+  website_id: string;
+  label: string;
+  path: string;
+  is_external: boolean;
+  sort_order: number;
+  location: 'header' | 'footer' | 'both';
+  status: ContentStatus;
+}
+
+export interface WebsiteReview {
+  id: string;
+  website_id: string;
+  author_name: string;
+  author_title?: string;
+  rating: number;
+  quote: string;
+  avatar_url?: string;
+  source: 'google' | 'trustpilot' | 'direct';
+  is_featured: boolean;
+  status: ContentStatus;
+  created_at: string;
+}
+
+export interface QuickActionItem {
+  id: string;
+  label: string;
+  action_tab: string;
+  sub_tab?: string;
+  icon: string;
+  description: string;
+}
+
+export interface PrioritizedAttentionItem {
+  id: string;
+  type: 'urgent' | 'warning' | 'info' | 'success';
+  title: string;
+  message: string;
+  action_tab: string;
+  sub_tab?: string;
+  action_label: string;
+}
+
+export interface DashboardNavTab {
+  id: string;
+  title: string;
+  icon: string;
+  badge?: string | number;
+  badgeColor?: string;
+}
+
+export interface DashboardNavGroup {
+  label: string;
+  items: DashboardNavTab[];
+}
+
+export interface DashboardEngineConfig {
+  websiteType: WebsiteType;
+  businessCategoryName: string;
+  navGroups: DashboardNavGroup[];
+  quickActions: QuickActionItem[];
+  priorities: PrioritizedAttentionItem[];
+  overviewMetrics: {
+    key: string;
+    label: string;
+    value: string | number;
+    change?: string;
+    subtext?: string;
+    isPositive?: boolean;
+  }[];
+}
+
 export interface TenantFeatures {
   has_bookings: boolean;
   has_ecommerce: boolean;
@@ -121,6 +467,7 @@ export interface Website {
   visitors_30d: number;
   last_deployed_at: string;
   framework: string;
+  config?: WebsiteConfig;
 }
 
 export type RequestStatus = 

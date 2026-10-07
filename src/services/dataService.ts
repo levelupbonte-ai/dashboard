@@ -123,6 +123,13 @@ const SEED_WEBSITES: Record<string, Website[]> = {
       visitors_30d: 14280,
       last_deployed_at: '2026-10-06T09:14:00Z',
       framework: 'Next.js 16 + Tailwind',
+      config: {
+        website_type: 'clinic',
+        features: ['information', 'homepage', 'media', 'services', 'team', 'bookings', 'faqs', 'announcements', 'blog', 'gallery', 'navigation', 'seo', 'analytics', 'requests'],
+        homepage_modules: ['hero', 'announcement', 'featured_services', 'doctors_preview', 'testimonials', 'faq'],
+        currency: 'USD',
+        timezone: 'America/New_York',
+      },
     },
     {
       id: 'web-lumina-telehealth',
@@ -138,6 +145,13 @@ const SEED_WEBSITES: Record<string, Website[]> = {
       visitors_30d: 4120,
       last_deployed_at: '2026-10-04T16:20:00Z',
       framework: 'Next.js 16 + Supabase',
+      config: {
+        website_type: 'clinic',
+        features: ['information', 'homepage', 'media', 'services', 'bookings', 'faqs', 'navigation', 'seo', 'analytics', 'requests'],
+        homepage_modules: ['hero', 'featured_services', 'faq'],
+        currency: 'USD',
+        timezone: 'America/New_York',
+      },
     },
   ],
   'tenant-apex-02': [
@@ -156,6 +170,13 @@ const SEED_WEBSITES: Record<string, Website[]> = {
       visitors_30d: 38450,
       last_deployed_at: '2026-10-05T18:40:00Z',
       framework: 'Next.js 16 + Shopify Headless',
+      config: {
+        website_type: 'ecommerce',
+        features: ['information', 'homepage', 'media', 'products', 'inventory', 'announcements', 'faqs', 'navigation', 'seo', 'analytics', 'requests'],
+        homepage_modules: ['hero', 'featured_products', 'announcement', 'reviews', 'faq'],
+        currency: 'USD',
+        timezone: 'America/Los_Angeles',
+      },
     },
   ],
   'tenant-vantage-03': [
@@ -173,6 +194,13 @@ const SEED_WEBSITES: Record<string, Website[]> = {
       visitors_30d: 6890,
       last_deployed_at: '2026-09-28T11:00:00Z',
       framework: 'Vite + React + Tailwind',
+      config: {
+        website_type: 'corporate',
+        features: ['information', 'homepage', 'media', 'services', 'team', 'blog', 'faqs', 'navigation', 'seo', 'analytics', 'requests'],
+        homepage_modules: ['hero', 'advisory_services', 'leadership', 'insights', 'contact'],
+        currency: 'USD',
+        timezone: 'America/New_York',
+      },
     },
   ],
   'tenant-velvet-04': [
@@ -190,6 +218,13 @@ const SEED_WEBSITES: Record<string, Website[]> = {
       visitors_30d: 11200,
       last_deployed_at: '2026-10-02T14:10:00Z',
       framework: 'Next.js 16 + Resend + Stripe',
+      config: {
+        website_type: 'restaurant',
+        features: ['information', 'homepage', 'media', 'menu', 'bookings', 'gallery', 'announcements', 'events', 'faqs', 'navigation', 'seo', 'analytics', 'requests'],
+        homepage_modules: ['hero', 'evening_menu_preview', 'announcement', 'ambiance_gallery', 'cellar', 'reservations'],
+        currency: 'USD',
+        timezone: 'America/New_York',
+      },
     },
   ],
 };

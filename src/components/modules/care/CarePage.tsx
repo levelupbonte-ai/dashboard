@@ -70,8 +70,7 @@ export const CarePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="px-2.5 py-1 rounded bg-muted border border-border text-emerald-500 text-xs font-medium flex items-center gap-1.5 self-start sm:self-auto">
-            <span className="size-1.5 rounded-full bg-emerald-500" />
+          <div className="px-2 py-0.5 rounded border border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-medium tracking-tight self-start sm:self-auto">
             Active
           </div>
         </div>

@@ -2,26 +2,40 @@ import React from 'react';
 import {
   LayoutDashboard,
   Globe,
-  Gauge,
-  FileCode2,
-  Users2,
-  CalendarDays,
+  FileText,
+  Image as ImageIcon,
+  Utensils,
+  Briefcase,
   ShoppingBag,
+  Users,
+  Camera,
+  Megaphone,
+  BookOpen,
+  CalendarDays,
+  Users2,
+  Package,
+  Boxes,
   LineChart,
   SearchCode,
+  Gauge,
+  FileCode2,
   CreditCard,
   ShieldCheck,
+  UserCheck,
   LifeBuoy,
   Settings,
   ChevronLeft,
   ChevronRight,
-  UserCheck,
+  MessageSquare,
 } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
 import { useAuth } from '../../context/AuthContext';
 import { OrgSwitcher } from '../shadcn/OrgSwitcher';
 import { NavUser } from '../shadcn/NavUser';
 import { cn } from '../../lib/utils';
+import { generateDashboardEngineConfig } from '../../lib/dashboardEngine';
+import { dataService } from '../../services/dataService';
+import { websiteDataService } from '../../services/websiteDataService';
 
 interface ShadcnSidebarProps {
   activeTab: string;
@@ -37,75 +51,88 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
   onSelectTab,
   isCollapsed,
   onToggleCollapse,
-  pendingRequestsCount,
   onOpenNotifications,
 }) => {
-  const { currentTenant, hasBookings, hasEcommerce, hasSeo, hasCarePlan } = useTenant();
-  const { can } = useAuth();
+  const { currentTenant, activeWebsite, websites } = useTenant();
+  const { orgRole } = useAuth();
 
-  const canViewBilling = can('billing.view');
-  const isMedical = currentTenant.slug === 'lumina-health';
-  const isHospitality = currentTenant.slug === 'velvet-vine';
+  const site = activeWebsite || websites[0];
+  const bookings = dataService.getBookings(currentTenant.id);
+  const leads = dataService.getLeads(currentTenant.id);
+  const requests = dataService.getRequests(currentTenant.id);
+  const orders = dataService.getStoreOrders(currentTenant.id);
 
-  const enquiriesLabel = isMedical ? 'Patient enquiries' : 'New enquiries';
-  const bookingsLabel = isHospitality ? 'Reservations' : 'Appointments';
+  const products = site ? websiteDataService.getProducts(site.id) : [];
+  const lowStock = products.filter((p) => p.inventory_count <= p.low_stock_threshold);
+  const announcements = site ? websiteDataService.getAnnouncements(site.id) : [];
+  const draftAnnouncements = announcements.filter((a) => a.status === 'draft');
 
-  // Client-Only Organization Navigation Structure
-  const navGroups = [
-    {
-      label: 'Overview',
-      items: [{ id: 'overview', title: 'Overview', icon: LayoutDashboard }],
-    },
-    {
-      label: 'Website',
-      items: [
-        { id: 'websites', title: 'My websites', icon: Globe },
-        {
-          id: 'requests',
-          title: 'Open requests',
-          icon: FileCode2,
-        },
-      ],
-    },
-    {
-      label: 'Business',
-      items: [
-        { id: 'leads', title: enquiriesLabel, icon: Users2 },
-        ...(hasBookings ? [{ id: 'bookings', title: bookingsLabel, icon: CalendarDays }] : []),
-        ...(hasEcommerce ? [{ id: 'store', title: 'Orders', icon: ShoppingBag }] : []),
-      ],
-    },
-    {
-      label: 'Performance',
-      items: [
-        { id: 'analytics', title: 'Website traffic', icon: LineChart },
-        ...(hasSeo ? [{ id: 'seo', title: 'Search visibility', icon: SearchCode }] : []),
-        { id: 'performance', title: 'Website performance', icon: Gauge },
-      ],
-    },
-    ...(canViewBilling
-      ? [
-          {
-            label: 'Billing',
-            items: [
-              { id: 'billing', title: 'Billing', icon: CreditCard },
-              ...(hasCarePlan ? [{ id: 'care', title: 'Subscription', icon: ShieldCheck }] : []),
-            ],
-          },
-        ]
-      : []),
-    {
-      label: 'Team',
-      items: [{ id: 'team', title: 'Team', icon: UserCheck }],
-    },
-    {
-      label: 'Account',
-      items: [
-        { id: 'support', title: 'Support', icon: LifeBuoy },
-        { id: 'settings', title: 'Settings', icon: Settings },
-      ],
-    },
-  ];
+  const engine = generateDashboardEngineConfig(currentTenant, site, orgRole, {
+    pendingBookingsCount: bookings.filter((b) => b.status === 'pending').length,
+    upcomingBookingsCount: bookings.filter((b) => b.status !== 'cancelled').length,
+    openRequestsCount: requests.filter((r) => r.status !== 'completed').length,
+    newLeadsCount: leads.filter((l) => l.status === 'new').length,
+    storeOrdersCount: orders.length,
+    lowStockItemsCount: lowStock.length,
+    draftAnnouncementsCount: draftAnnouncements.length,
+    totalVisitors: site ? site.visitors_30d : 12480,
+  });
+
+  const getIconComponent = (name: string) => {
+    switch (name) {
+      case 'LayoutDashboard':
+        return LayoutDashboard;
+      case 'Globe':
+        return Globe;
+      case 'FileText':
+        return FileText;
+      case 'Image':
+        return ImageIcon;
+      case 'Utensils':
+        return Utensils;
+      case 'Briefcase':
+        return Briefcase;
+      case 'ShoppingBag':
+        return ShoppingBag;
+      case 'Users':
+        return Users;
+      case 'Camera':
+        return Camera;
+      case 'Megaphone':
+        return Megaphone;
+      case 'BookOpen':
+        return BookOpen;
+      case 'CalendarDays':
+        return CalendarDays;
+      case 'Users2':
+        return Users2;
+      case 'Package':
+        return Package;
+      case 'Boxes':
+        return Boxes;
+      case 'MessageSquare':
+        return MessageSquare;
+      case 'LineChart':
+        return LineChart;
+      case 'SearchCode':
+        return SearchCode;
+      case 'Gauge':
+        return Gauge;
+      case 'FileCode2':
+        return FileCode2;
+      case 'CreditCard':
+        return CreditCard;
+      case 'ShieldCheck':
+        return ShieldCheck;
+      case 'UserCheck':
+        return UserCheck;
+      case 'LifeBuoy':
+        return LifeBuoy;
+      case 'Settings':
+      default:
+        return Settings;
+    }
+  };
 
   return (
     <aside
@@ -114,24 +141,24 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
         isCollapsed ? 'w-[68px]' : 'w-60'
       )}
     >
-      {/* 1. Sidebar Header: Organization Switcher (OrgSwitcher) */}
+      {/* 1. Sidebar Header: Organization Switcher */}
       <div className="px-3 py-2.5 border-b border-border/40">
         <OrgSwitcher isCollapsed={isCollapsed} />
       </div>
 
-      {/* 2. Sidebar Navigation Items */}
-      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5 scrollbar-none">
-        {navGroups.map((group, gIdx) => (
+      {/* 2. Sidebar Navigation Groups (Dynamically Generated from Engine) */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4 scrollbar-none">
+        {engine.navGroups.map((group, gIdx) => (
           <div key={gIdx} className="space-y-1">
             {!isCollapsed && (
-              <div className="px-2.5 pb-1 text-[11px] font-medium text-muted-foreground/80">
+              <div className="px-2.5 pb-1 text-[11px] font-medium text-muted-foreground/80 uppercase tracking-wider">
                 {group.label}
               </div>
             )}
 
             <div className="space-y-0.5">
               {group.items.map((item) => {
-                const Icon = item.icon;
+                const Icon = getIconComponent(item.icon);
                 const isActive = activeTab === item.id;
                 return (
                   <button
@@ -159,11 +186,19 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
                       <span className="truncate flex-1">{item.title}</span>
                     )}
 
-                    {/* Tooltip on collapsed mode */}
-                    {isCollapsed && (
-                      <div className="fixed left-[72px] ml-1 hidden group-hover:flex items-center px-2.5 py-1.5 rounded-md bg-popover text-popover-foreground text-xs font-medium shadow-md border border-border/60 z-50 pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95 duration-100">
-                        {item.title}
-                      </div>
+                    {!isCollapsed && item.badge !== undefined && (
+                      <span
+                        className={cn(
+                          'text-[10px] font-mono px-1.5 py-0.2 rounded border',
+                          item.badgeColor === 'amber'
+                            ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                            : item.badgeColor === 'rose'
+                            ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                            : 'bg-muted text-muted-foreground border-border'
+                        )}
+                      >
+                        {item.badge}
+                      </span>
                     )}
                   </button>
                 );
@@ -173,31 +208,23 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
         ))}
       </div>
 
-      {/* 3. Collapse Toggle Button & User Profile Footer (NavUser) */}
-      <div className="p-2.5 border-t border-border/40 space-y-1">
-        <NavUser
-          isCollapsed={isCollapsed}
-          onNavigateTab={onSelectTab}
-          onOpenNotifications={onOpenNotifications}
-        />
+      {/* 3. Bottom Controls: User profile + Collapse trigger */}
+      <div className="p-3 border-t border-border/40 space-y-2">
+        <NavUser isCollapsed={isCollapsed} onOpenNotifications={onOpenNotifications} />
 
-        {/* Collapsible toggle bar */}
         <button
           onClick={onToggleCollapse}
-          className={cn(
-            'w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors',
-            isCollapsed && 'justify-center'
-          )}
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="w-full flex items-center justify-center p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          aria-label={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
         >
           {isCollapsed ? (
-            <ChevronRight className="size-3.5" />
+            <ChevronRight className="size-4" />
           ) : (
-            <>
-              <ChevronLeft className="size-3.5" />
-              <span className="text-xs">Collapse sidebar</span>
-            </>
+            <div className="flex items-center gap-2 text-xs">
+              <ChevronLeft className="size-4" />
+              <span>Collapse Sidebar</span>
+            </div>
           )}
         </button>
       </div>

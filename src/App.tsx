@@ -15,6 +15,7 @@ import { NotificationDrawer } from './components/notifications/NotificationDrawe
 import { DatabaseLoadingSkeleton } from './components/shared/DatabaseLoadingSkeleton';
 import { OverviewPage } from './components/modules/overview/OverviewPage';
 import { WebsitesPage } from './components/modules/websites/WebsitesPage';
+import { WebsiteControlCenter } from './components/modules/website/WebsiteControlCenter';
 import { RequestsPage } from './components/modules/requests/RequestsPage';
 import { LeadsPage } from './components/modules/leads/LeadsPage';
 import { BookingsPage } from './components/modules/bookings/BookingsPage';
@@ -42,6 +43,7 @@ const DashboardContent: React.FC = () => {
   const canViewBilling = can('billing.view');
 
   const [activeTab, setActiveTab] = useState<string>('overview');
+  const [websiteSubTab, setWebsiteSubTab] = useState<string>('info');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     return typeof window !== 'undefined' ? window.innerWidth < 1024 : false;
   });
@@ -73,10 +75,49 @@ const DashboardContent: React.FC = () => {
     }
   }, [currentTenant.id, hasBookings, hasEcommerce, hasSeo, canViewBilling, activeTab]);
 
-  const handleNavigateTab = (tabId: string) => {
-    if (tabId !== activeTab) {
-      triggerDatabaseLoad(420);
-      setActiveTab(tabId);
+  const handleNavigateTab = (tabId: string, subTab?: string) => {
+    let targetTab = tabId;
+    if (subTab) {
+      setWebsiteSubTab(subTab);
+    }
+
+    if (tabId === 'website-control') {
+      setWebsiteSubTab(subTab || 'info');
+    } else if (tabId === 'website-content') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('homepage');
+    } else if (tabId === 'website-media') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('media');
+    } else if (tabId === 'website-menu') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('menu');
+    } else if (tabId === 'website-services') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('services');
+    } else if (tabId === 'website-products') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('products');
+    } else if (tabId === 'website-team') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('team');
+    } else if (tabId === 'website-gallery') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('gallery');
+    } else if (tabId === 'website-announcements') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('announcements');
+    } else if (tabId === 'website-blog') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('blog');
+    } else if (tabId === 'inventory') {
+      targetTab = 'website-control';
+      setWebsiteSubTab('products');
+    }
+
+    if (targetTab !== activeTab || (subTab && subTab !== websiteSubTab)) {
+      triggerDatabaseLoad(350);
+      setActiveTab(targetTab);
     }
   };
 
@@ -104,6 +145,23 @@ const DashboardContent: React.FC = () => {
           />
         );
       case 'websites':
+      case 'website-control':
+      case 'website-content':
+      case 'website-media':
+      case 'website-menu':
+      case 'website-services':
+      case 'website-products':
+      case 'website-team':
+      case 'website-gallery':
+      case 'website-announcements':
+      case 'website-blog':
+        return (
+          <WebsiteControlCenter
+            initialSubTab={websiteSubTab}
+            onRequestChange={() => handleRequestChange()}
+            onNavigateTab={handleNavigateTab}
+          />
+        );
       case 'performance':
         return (
           <WebsitesPage

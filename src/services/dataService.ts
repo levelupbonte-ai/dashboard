@@ -21,6 +21,10 @@ import {
   AuditLogItem,
   RequestStatus,
   LeadStatus,
+  OrganizationMember,
+  OrganizationInvitation,
+  OrganizationActivityItem,
+  OrganizationRole,
 } from '../types';
 
 // =======================================================================
@@ -504,6 +508,17 @@ const SEED_BOOKINGS: Record<string, Booking[]> = {
 const SEED_INVOICES: Record<string, Invoice[]> = {
   'tenant-lumina-01': [
     {
+      id: 'inv-lum-000',
+      tenant_id: 'tenant-lumina-01',
+      invoice_number: 'INV-2026-1004',
+      amount: 99.00,
+      currency: 'USD',
+      status: 'open',
+      due_date: '2026-11-01',
+      description: 'Website Care - Pro Tier Renewal (Nov 2026)',
+      pdf_url: '#',
+    },
+    {
       id: 'inv-lum-001',
       tenant_id: 'tenant-lumina-01',
       invoice_number: 'INV-2026-0891',
@@ -757,6 +772,218 @@ const SEED_AUDIT_LOGS: AuditLogItem[] = [
   },
 ];
 
+const SEED_ORG_MEMBERS: Record<string, OrganizationMember[]> = {
+  'tenant-lumina-01': [
+    {
+      id: 'mem-lum-1',
+      organization_id: 'tenant-lumina-01',
+      full_name: 'Dr. Sarah Lin',
+      email: 'dr.lin@luminahealth.com',
+      org_role: 'OWNER',
+      title: 'Chief Medical Director & Founder',
+      mfa_enabled: true,
+      status: 'active',
+      joined_at: '2025-11-12T00:00:00Z',
+      last_active_at: '2026-10-06T15:10:00Z',
+    },
+    {
+      id: 'mem-lum-2',
+      organization_id: 'tenant-lumina-01',
+      full_name: 'Marcus Chen',
+      email: 'm.chen@luminahealth.com',
+      org_role: 'ADMIN',
+      title: 'VP of Clinic Operations',
+      mfa_enabled: true,
+      status: 'active',
+      joined_at: '2025-11-15T09:00:00Z',
+      last_active_at: '2026-10-06T14:20:00Z',
+    },
+    {
+      id: 'mem-lum-3',
+      organization_id: 'tenant-lumina-01',
+      full_name: 'David Wilson',
+      email: 'd.wilson@luminahealth.com',
+      org_role: 'MEMBER',
+      title: 'Patient Intake Coordinator',
+      mfa_enabled: false,
+      status: 'active',
+      joined_at: '2026-01-10T11:30:00Z',
+      last_active_at: '2026-10-06T12:45:00Z',
+    },
+    {
+      id: 'mem-lum-4',
+      organization_id: 'tenant-lumina-01',
+      full_name: 'Emma Davis',
+      email: 'e.davis@luminahealth.com',
+      org_role: 'VIEWER',
+      title: 'External Compliance Auditor',
+      mfa_enabled: true,
+      status: 'active',
+      joined_at: '2026-03-04T16:00:00Z',
+      last_active_at: '2026-10-05T18:10:00Z',
+    },
+  ],
+  'tenant-apex-02': [
+    {
+      id: 'mem-apx-1',
+      organization_id: 'tenant-apex-02',
+      full_name: 'Elena Rostova',
+      email: 'elena@apexgoods.store',
+      org_role: 'OWNER',
+      title: 'Creative Director & Founder',
+      mfa_enabled: true,
+      status: 'active',
+      joined_at: '2026-01-10T00:00:00Z',
+      last_active_at: '2026-10-06T14:55:00Z',
+    },
+    {
+      id: 'mem-apx-2',
+      organization_id: 'tenant-apex-02',
+      full_name: 'Lucas Meyer',
+      email: 'lucas@apexgoods.store',
+      org_role: 'ADMIN',
+      title: 'Head of E-Commerce',
+      mfa_enabled: true,
+      status: 'active',
+      joined_at: '2026-01-18T10:00:00Z',
+      last_active_at: '2026-10-06T13:12:00Z',
+    },
+    {
+      id: 'mem-apx-3',
+      organization_id: 'tenant-apex-02',
+      full_name: 'Sophie Laurent',
+      email: 'sophie@apexgoods.store',
+      org_role: 'MEMBER',
+      title: 'Merchandising Specialist',
+      mfa_enabled: false,
+      status: 'active',
+      joined_at: '2026-04-02T09:00:00Z',
+      last_active_at: '2026-10-05T19:00:00Z',
+    },
+  ],
+  'tenant-vantage-03': [
+    {
+      id: 'mem-van-1',
+      organization_id: 'tenant-vantage-03',
+      full_name: 'Richard Chen',
+      email: 'rchen@vantagecap.io',
+      org_role: 'OWNER',
+      title: 'Managing Partner',
+      mfa_enabled: true,
+      status: 'active',
+      joined_at: '2026-02-15T00:00:00Z',
+      last_active_at: '2026-10-06T11:30:00Z',
+    },
+    {
+      id: 'mem-van-2',
+      organization_id: 'tenant-vantage-03',
+      full_name: 'Hannah Abbott',
+      email: 'habbott@vantagecap.io',
+      org_role: 'VIEWER',
+      title: 'Investor Relations Analyst',
+      mfa_enabled: true,
+      status: 'active',
+      joined_at: '2026-05-01T00:00:00Z',
+      last_active_at: '2026-10-04T15:00:00Z',
+    },
+  ],
+  'tenant-velvet-04': [
+    {
+      id: 'mem-vel-1',
+      organization_id: 'tenant-velvet-04',
+      full_name: 'Julian Vance',
+      email: 'julian@velvetvine.com',
+      org_role: 'OWNER',
+      title: 'Hospitality Director',
+      mfa_enabled: true,
+      status: 'active',
+      joined_at: '2026-03-01T00:00:00Z',
+      last_active_at: '2026-10-06T13:00:00Z',
+    },
+  ],
+};
+
+const SEED_ORG_INVITATIONS: Record<string, OrganizationInvitation[]> = {
+  'tenant-lumina-01': [
+    {
+      id: 'inv-tok-901',
+      organization_id: 'tenant-lumina-01',
+      email: 'dr.patel@luminahealth.com',
+      org_role: 'MEMBER',
+      invited_by_name: 'Dr. Sarah Lin',
+      token_preview: 'lu_inv_9f8a...c41e (Single-use SHA-256)',
+      status: 'pending',
+      created_at: '2026-10-06T10:00:00Z',
+      expires_at: '2026-10-09T10:00:00Z',
+    },
+  ],
+  'tenant-apex-02': [],
+  'tenant-vantage-03': [],
+  'tenant-velvet-04': [],
+};
+
+const SEED_ORG_ACTIVITY: Record<string, OrganizationActivityItem[]> = {
+  'tenant-lumina-01': [
+    {
+      id: 'act-1',
+      organization_id: 'tenant-lumina-01',
+      actor_name: 'Dr. Sarah Lin',
+      actor_email: 'dr.lin@luminahealth.com',
+      actor_role: 'OWNER',
+      action: 'submitted a website change request',
+      target: 'Update Autumn Flu Clinic schedule banner',
+      category: 'request',
+      created_at: '2026-10-06T14:15:00Z',
+    },
+    {
+      id: 'act-2',
+      organization_id: 'tenant-lumina-01',
+      actor_name: 'David Wilson',
+      actor_email: 'd.wilson@luminahealth.com',
+      actor_role: 'MEMBER',
+      action: 'qualified inbound lead',
+      target: 'Miriam Al-Hassan ($15,000 Corporate Wellness)',
+      category: 'website',
+      created_at: '2026-10-06T12:40:00Z',
+    },
+    {
+      id: 'act-3',
+      organization_id: 'tenant-lumina-01',
+      actor_name: 'Dr. Sarah Lin',
+      actor_email: 'dr.lin@luminahealth.com',
+      actor_role: 'OWNER',
+      action: 'invited team member',
+      target: 'dr.patel@luminahealth.com (Role: MEMBER)',
+      category: 'team',
+      created_at: '2026-10-06T10:00:00Z',
+    },
+    {
+      id: 'act-4',
+      organization_id: 'tenant-lumina-01',
+      actor_name: 'Marcus Chen',
+      actor_email: 'm.chen@luminahealth.com',
+      actor_role: 'ADMIN',
+      action: 'opened support ticket',
+      target: 'Google Workspace MX Records migration verification',
+      category: 'support',
+      created_at: '2026-10-05T08:10:00Z',
+    },
+  ],
+  'tenant-apex-02': [
+    {
+      id: 'act-apx-1',
+      organization_id: 'tenant-apex-02',
+      actor_name: 'Elena Rostova',
+      actor_email: 'elena@apexgoods.store',
+      actor_role: 'OWNER',
+      action: 'created urgent campaign request',
+      target: 'Configure Black Friday teaser landing page',
+      category: 'request',
+      created_at: '2026-10-05T19:30:00Z',
+    },
+  ],
+};
+
 // In-Memory Mutables (retained during session)
 let tenantsState = [...SEED_TENANTS];
 const requestsState = { ...SEED_REQUESTS };
@@ -764,6 +991,10 @@ const leadsState = { ...SEED_LEADS };
 const bookingsState = { ...SEED_BOOKINGS };
 const ticketsState = { ...SEED_TICKETS };
 const notificationsState = { ...SEED_NOTIFICATIONS };
+const invoicesState = { ...SEED_INVOICES };
+const orgMembersState = { ...SEED_ORG_MEMBERS };
+const orgInvitationsState = { ...SEED_ORG_INVITATIONS };
+const orgActivityState = { ...SEED_ORG_ACTIVITY };
 
 // =======================================================================
 // SERVICE REPOSITORY API (Multi-Tenant Enforced)
@@ -906,7 +1137,144 @@ export const dataService = {
 
   // INVOICES (Tenant scoped)
   getInvoices: (tenantId: string): Invoice[] => {
-    return SEED_INVOICES[tenantId] || [];
+    return invoicesState[tenantId] || [];
+  },
+
+  // ORGANIZATION TEAM MEMBERS (Strictly scoped to organization_id / tenantId)
+  getOrganizationMembers: (tenantId: string): OrganizationMember[] => {
+    return orgMembersState[tenantId] || [];
+  },
+
+  getOrganizationInvitations: (tenantId: string): OrganizationInvitation[] => {
+    return orgInvitationsState[tenantId] || [];
+  },
+
+  getOrganizationActivity: (tenantId: string): OrganizationActivityItem[] => {
+    return orgActivityState[tenantId] || [];
+  },
+
+  logOrganizationActivity: (
+    tenantId: string,
+    payload: Omit<OrganizationActivityItem, 'id' | 'organization_id' | 'created_at'>
+  ): OrganizationActivityItem => {
+    const entry: OrganizationActivityItem = {
+      ...payload,
+      id: `act-${Date.now().toString(36)}`,
+      organization_id: tenantId,
+      created_at: new Date().toISOString(),
+    };
+    if (!orgActivityState[tenantId]) {
+      orgActivityState[tenantId] = [];
+    }
+    orgActivityState[tenantId] = [entry, ...orgActivityState[tenantId]];
+    return entry;
+  },
+
+  inviteOrganizationMember: (
+    tenantId: string,
+    email: string,
+    orgRole: OrganizationRole,
+    invitedByName: string,
+    invitedByEmail: string,
+    actorRole: OrganizationRole
+  ): OrganizationInvitation => {
+    const cleanEmail = email.trim().toLowerCase();
+    const randomHex = Math.random().toString(16).substring(2, 6);
+    const invitation: OrganizationInvitation = {
+      id: `inv-tok-${Date.now().toString(36)}`,
+      organization_id: tenantId,
+      email: cleanEmail,
+      org_role: orgRole,
+      invited_by_name: invitedByName,
+      token_preview: `lu_inv_${randomHex}...${Date.now().toString(16).slice(-4)} (Single-use SHA-256)`,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 72 * 3600 * 1000).toISOString(),
+    };
+
+    if (!orgInvitationsState[tenantId]) {
+      orgInvitationsState[tenantId] = [];
+    }
+    orgInvitationsState[tenantId] = [invitation, ...orgInvitationsState[tenantId]];
+
+    dataService.logOrganizationActivity(tenantId, {
+      actor_name: invitedByName,
+      actor_email: invitedByEmail,
+      actor_role: actorRole,
+      action: 'sent a secure organization invitation to',
+      target: `${cleanEmail} (Role: ${orgRole})`,
+      category: 'team',
+    });
+
+    return invitation;
+  },
+
+  revokeOrganizationInvitation: (
+    tenantId: string,
+    invitationId: string,
+    actorName: string,
+    actorEmail: string,
+    actorRole: OrganizationRole
+  ): void => {
+    const list = orgInvitationsState[tenantId] || [];
+    const target = list.find((i) => i.id === invitationId);
+    if (target) {
+      target.status = 'revoked';
+      dataService.logOrganizationActivity(tenantId, {
+        actor_name: actorName,
+        actor_email: actorEmail,
+        actor_role: actorRole,
+        action: 'revoked pending invitation for',
+        target: target.email,
+        category: 'team',
+      });
+    }
+  },
+
+  updateOrganizationMemberRole: (
+    tenantId: string,
+    memberId: string,
+    newRole: OrganizationRole,
+    actorName: string,
+    actorEmail: string,
+    actorRole: OrganizationRole
+  ): void => {
+    const members = orgMembersState[tenantId] || [];
+    const target = members.find((m) => m.id === memberId);
+    if (target) {
+      const oldRole = target.org_role;
+      target.org_role = newRole;
+      dataService.logOrganizationActivity(tenantId, {
+        actor_name: actorName,
+        actor_email: actorEmail,
+        actor_role: actorRole,
+        action: `updated organization role (${oldRole} → ${newRole}) for`,
+        target: `${target.full_name} (${target.email})`,
+        category: 'team',
+      });
+    }
+  },
+
+  removeOrganizationMember: (
+    tenantId: string,
+    memberId: string,
+    actorName: string,
+    actorEmail: string,
+    actorRole: OrganizationRole
+  ): void => {
+    const members = orgMembersState[tenantId] || [];
+    const target = members.find((m) => m.id === memberId);
+    if (target) {
+      orgMembersState[tenantId] = members.filter((m) => m.id !== memberId);
+      dataService.logOrganizationActivity(tenantId, {
+        actor_name: actorName,
+        actor_email: actorEmail,
+        actor_role: actorRole,
+        action: 'removed member from organization',
+        target: `${target.full_name} (${target.email})`,
+        category: 'team',
+      });
+    }
   },
 
   // SUPPORT TICKETS (Tenant scoped)

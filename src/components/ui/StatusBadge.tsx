@@ -3,8 +3,11 @@ import { cn } from '../../lib/utils';
 
 type StatusType =
   | 'live'
+  | 'online'
+  | 'needs_attention'
   | 'submitted'
   | 'in_review'
+  | 'under_review'
   | 'in_progress'
   | 'waiting_for_client'
   | 'completed'
@@ -14,10 +17,14 @@ type StatusType =
   | 'converted'
   | 'lost'
   | 'confirmed'
+  | 'scheduled'
   | 'pending'
   | 'cancelled'
   | 'paid'
   | 'open'
+  | 'overdue'
+  | 'past_due'
+  | 'draft'
   | 'resolved';
 
 interface StatusBadgeProps {
@@ -30,51 +37,61 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, classNa
   const normStatus = (status || '').toLowerCase().replace(/\s+/g, '_');
 
   const configs: Record<string, { dot: string; text: string; bg: string; border: string; display: string }> = {
-    // Website & runtime
-    live: { dot: 'bg-emerald-400', text: 'text-emerald-300', bg: 'bg-emerald-950/20', border: 'border-emerald-800/40', display: 'Live' },
-    building: { dot: 'bg-amber-400', text: 'text-amber-300', bg: 'bg-amber-950/20', border: 'border-amber-800/40', display: 'Building' },
-    offline: { dot: 'bg-rose-400', text: 'text-rose-300', bg: 'bg-rose-950/20', border: 'border-rose-800/40', display: 'Offline' },
-    
+    // Website
+    live: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Live' },
+    online: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Online' },
+    building: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'In progress' },
+    maintenance: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'Needs attention' },
+    needs_attention: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'Needs attention' },
+    offline: { dot: 'bg-rose-500', text: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/20', display: 'Offline' },
+
     // Requests
-    submitted: { dot: 'bg-sky-400', text: 'text-sky-300', bg: 'bg-sky-950/20', border: 'border-sky-800/40', display: 'Submitted' },
-    in_review: { dot: 'bg-amber-400', text: 'text-amber-300', bg: 'bg-amber-950/20', border: 'border-amber-800/40', display: 'In Review' },
-    in_progress: { dot: 'bg-violet-400', text: 'text-violet-300', bg: 'bg-violet-950/20', border: 'border-violet-800/40', display: 'In Progress' },
-    waiting_for_client: { dot: 'bg-yellow-400', text: 'text-yellow-300', bg: 'bg-yellow-950/20', border: 'border-yellow-800/40', display: 'Waiting for Client' },
-    completed: { dot: 'bg-emerald-400', text: 'text-emerald-300', bg: 'bg-emerald-950/20', border: 'border-emerald-800/40', display: 'Completed' },
-    
-    // Leads
-    new: { dot: 'bg-sky-400', text: 'text-sky-300', bg: 'bg-sky-950/20', border: 'border-sky-800/40', display: 'New' },
-    contacted: { dot: 'bg-blue-400', text: 'text-blue-300', bg: 'bg-blue-950/20', border: 'border-blue-800/40', display: 'Contacted' },
-    qualified: { dot: 'bg-violet-400', text: 'text-violet-300', bg: 'bg-violet-950/20', border: 'border-violet-800/40', display: 'Qualified' },
-    converted: { dot: 'bg-emerald-400', text: 'text-emerald-300', bg: 'bg-emerald-950/20', border: 'border-emerald-800/40', display: 'Converted' },
-    lost: { dot: 'bg-zinc-400', text: 'text-zinc-400', bg: 'bg-zinc-900/40', border: 'border-zinc-800', display: 'Lost' },
-    
-    // Bookings
-    confirmed: { dot: 'bg-emerald-400', text: 'text-emerald-300', bg: 'bg-emerald-950/20', border: 'border-emerald-800/40', display: 'Confirmed' },
-    pending: { dot: 'bg-amber-400', text: 'text-amber-300', bg: 'bg-amber-950/20', border: 'border-amber-800/40', display: 'Pending' },
-    cancelled: { dot: 'bg-rose-400', text: 'text-rose-300', bg: 'bg-rose-950/20', border: 'border-rose-800/40', display: 'Cancelled' },
+    submitted: { dot: 'bg-sky-500', text: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/20', display: 'Pending' },
+    in_review: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'Under review' },
+    under_review: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'Under review' },
+    in_progress: { dot: 'bg-primary', text: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/20', display: 'In progress' },
+    waiting_for_client: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'Needs attention' },
+    completed: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Completed' },
 
-    // Invoices
-    paid: { dot: 'bg-emerald-400', text: 'text-emerald-300', bg: 'bg-emerald-950/20', border: 'border-emerald-800/40', display: 'Paid' },
-    open: { dot: 'bg-amber-400', text: 'text-amber-300', bg: 'bg-amber-950/20', border: 'border-amber-800/40', display: 'Open' },
-    overdue: { dot: 'bg-rose-400', text: 'text-rose-300', bg: 'bg-rose-950/20', border: 'border-rose-800/40', display: 'Overdue' },
+    // Enquiries / Leads
+    new: { dot: 'bg-sky-500', text: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/20', display: 'New' },
+    contacted: { dot: 'bg-blue-500', text: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20', display: 'Contacted' },
+    qualified: { dot: 'bg-primary', text: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/20', display: 'Qualified' },
+    converted: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Completed' },
+    lost: { dot: 'bg-muted-foreground', text: 'text-muted-foreground', bg: 'bg-muted', border: 'border-border', display: 'Cancelled' },
 
-    // Tickets
-    resolved: { dot: 'bg-emerald-400', text: 'text-emerald-300', bg: 'bg-emerald-950/20', border: 'border-emerald-800/40', display: 'Resolved' },
+    // Appointments / Bookings
+    confirmed: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Scheduled' },
+    scheduled: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Scheduled' },
+    pending: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'Pending' },
+    cancelled: { dot: 'bg-rose-500', text: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/20', display: 'Cancelled' },
+
+    // Invoices & Orders
+    paid: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Paid' },
+    open: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'Pending' },
+    overdue: { dot: 'bg-rose-500', text: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/20', display: 'Past due' },
+    past_due: { dot: 'bg-rose-500', text: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/20', display: 'Past due' },
+    draft: { dot: 'bg-muted-foreground', text: 'text-muted-foreground', bg: 'bg-muted', border: 'border-border', display: 'Draft' },
+    processing: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'In progress' },
+    shipped: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Completed' },
+
+    // Support
+    resolved: { dot: 'bg-emerald-500', text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', display: 'Completed' },
+    waiting: { dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20', display: 'Pending' },
   };
 
   const current = configs[normStatus] || {
-    dot: 'bg-zinc-400',
-    text: 'text-zinc-300',
-    bg: 'bg-zinc-900/30',
-    border: 'border-zinc-800',
+    dot: 'bg-muted-foreground',
+    text: 'text-foreground',
+    bg: 'bg-muted',
+    border: 'border-border',
     display: label || status,
   };
 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-mono tracking-tight font-medium rounded border whitespace-nowrap',
+        'inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md border whitespace-nowrap',
         current.bg,
         current.border,
         current.text,

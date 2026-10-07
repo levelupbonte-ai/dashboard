@@ -6,11 +6,12 @@ import {
   Bell,
   LogOut,
   User,
-  ShieldCheck,
+  Users2,
   Check,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { UserRole } from '../../types';
+import { OrganizationRole } from '../../types';
+import { ROLE_LABELS } from '../../lib/permissions';
 import { cn } from '../../lib/utils';
 
 interface NavUserProps {
@@ -24,8 +25,10 @@ export const NavUser: React.FC<NavUserProps> = ({
   onNavigateTab,
   onOpenNotifications,
 }) => {
-  const { user, role, setRole, isAdmin } = useAuth();
+  const { user, orgRole, setOrgRole, can } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+
+  const canViewBilling = can('billing.view');
 
   const getInitials = (name: string) => {
     return name
@@ -44,7 +47,7 @@ export const NavUser: React.FC<NavUserProps> = ({
           'w-full flex items-center gap-2.5 p-2 rounded-lg text-left transition-colors hover:bg-accent/60 group border border-transparent hover:border-border',
           isCollapsed && 'justify-center p-1.5'
         )}
-        title={user.full_name}
+        title={`${user.full_name} (${ROLE_LABELS[orgRole]})`}
         aria-label="User account menu"
       >
         <div className="size-8 rounded-lg bg-secondary text-secondary-foreground flex items-center justify-center font-mono font-semibold text-xs shrink-0 border border-border">
@@ -57,7 +60,7 @@ export const NavUser: React.FC<NavUserProps> = ({
               {user.full_name}
             </span>
             <span className="truncate text-[10px] text-muted-foreground font-mono">
-              {user.email}
+              {ROLE_LABELS[orgRole]} · {user.email}
             </span>
           </div>
         )}
@@ -72,7 +75,7 @@ export const NavUser: React.FC<NavUserProps> = ({
           <div className="fixed inset-0 z-50" onClick={() => setIsOpen(false)} />
           <div
             className={cn(
-              'absolute bottom-full mb-1.5 w-60 rounded-lg bg-card border border-border shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100',
+              'absolute bottom-full mb-1.5 w-64 rounded-lg bg-card border border-border shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100',
               isCollapsed ? 'left-full ml-2 bottom-0 mb-0' : 'left-0'
             )}
           >
@@ -93,27 +96,27 @@ export const NavUser: React.FC<NavUserProps> = ({
               </div>
             </div>
 
-            {/* Role Switcher Section */}
-            <div className="px-2 py-1.5 text-[10px] font-mono uppercase text-muted-foreground">
-              Simulate View Role
+            {/* Organization Role Switcher (To test OWNER / ADMIN / MEMBER / VIEWER permissions) */}
+            <div className="px-2 py-1 text-[10px] font-mono uppercase text-muted-foreground">
+              Organization Role
             </div>
             <div className="space-y-0.5 mb-1 border-b border-border/80 pb-1.5">
-              {(['client', 'admin', 'super_admin'] as UserRole[]).map((r) => (
+              {(['OWNER', 'ADMIN', 'MEMBER', 'VIEWER'] as OrganizationRole[]).map((r) => (
                 <button
                   key={r}
                   onClick={() => {
-                    setRole(r);
+                    setOrgRole(r);
                     setIsOpen(false);
                   }}
                   className={cn(
-                    'w-full flex items-center justify-between px-2 py-1 rounded text-xs transition-colors text-left',
-                    role === r
+                    'w-full flex items-center justify-between px-2 py-1.5 rounded text-xs transition-colors text-left',
+                    orgRole === r
                       ? 'bg-accent text-accent-foreground font-semibold'
                       : 'text-muted-foreground hover:bg-accent/40 hover:text-foreground'
                   )}
                 >
-                  <span className="capitalize">{r.replace('_', ' ')}</span>
-                  {role === r && <Check className="size-3 text-foreground" />}
+                  <span>{ROLE_LABELS[r]}</span>
+                  {orgRole === r && <Check className="size-3 text-foreground" />}
                 </button>
               ))}
             </div>
@@ -122,13 +125,13 @@ export const NavUser: React.FC<NavUserProps> = ({
             <div className="space-y-0.5">
               <button
                 onClick={() => {
-                  onNavigateTab?.('care');
+                  onNavigateTab?.('team');
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-foreground hover:bg-accent/60 transition-colors"
               >
-                <Sparkles className="size-3.5 text-foreground" />
-                <span>Care Plan Options</span>
+                <Users2 className="size-3.5 text-muted-foreground" />
+                <span>Organization Team</span>
               </button>
 
               <button
@@ -139,19 +142,34 @@ export const NavUser: React.FC<NavUserProps> = ({
                 className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-foreground hover:bg-accent/60 transition-colors"
               >
                 <User className="size-3.5 text-muted-foreground" />
-                <span>Account Profile</span>
+                <span>Account & Organization</span>
               </button>
 
-              <button
-                onClick={() => {
-                  onNavigateTab?.('billing');
-                  setIsOpen(false);
-                }}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-foreground hover:bg-accent/60 transition-colors"
-              >
-                <CreditCard className="size-3.5 text-muted-foreground" />
-                <span>Billing Ledger</span>
-              </button>
+              {canViewBilling && (
+                <>
+                  <button
+                    onClick={() => {
+                      onNavigateTab?.('billing');
+                      setIsOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-foreground hover:bg-accent/60 transition-colors"
+                  >
+                    <CreditCard className="size-3.5 text-muted-foreground" />
+                    <span>Billing & Invoices</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      onNavigateTab?.('care');
+                      setIsOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-foreground hover:bg-accent/60 transition-colors"
+                  >
+                    <Sparkles className="size-3.5 text-foreground" />
+                    <span>Care Plan Options</span>
+                  </button>
+                </>
+              )}
 
               <button
                 onClick={() => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, TrendingUp, PackageCheck, DollarSign, Clock } from 'lucide-react';
+import { ShoppingBag, PackageCheck, DollarSign } from 'lucide-react';
 import { useTenant } from '../../../context/TenantContext';
 import { dataService } from '../../../services/dataService';
 import { MetricCard } from '../../shared/MetricCard';
@@ -16,45 +16,45 @@ export const StorePage: React.FC = () => {
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="pb-3 sm:pb-4 border-b border-border">
-        <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Store & Checkouts</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Orders</h1>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Headless e-commerce telemetry, order fulfillment, and transaction logs.
+          Orders and revenue for {currentTenant.name}
         </p>
       </div>
 
-      {/* KPI Cards (3 cols tablet/desktop, 1 col mobile) */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <MetricCard
-          title="Revenue (30d)"
+          title="Revenue"
           value={formatCurrency(totalRevenue || 48290)}
-          subValue="Processed via Stripe"
-          change="+24.6%"
+          subValue="this month"
+          change="↑ 24.6% vs last month"
           changeType="positive"
-          icon={<DollarSign className="w-3.5 h-3.5 text-emerald-500" />}
+          icon={<DollarSign className="w-4 h-4 text-muted-foreground" />}
         />
         <MetricCard
           title="Orders"
           value="184"
-          subValue="Avg value $262"
-          change="+18.2%"
+          subValue="placed this month"
+          change="↑ 18.2% vs last month"
           changeType="positive"
-          icon={<ShoppingBag className="w-3.5 h-3.5 text-sky-500" />}
+          icon={<ShoppingBag className="w-4 h-4 text-muted-foreground" />}
         />
         <MetricCard
-          title="Fulfillment"
-          value="99.4%"
-          subValue="Zero backlog"
-          change="Optimal"
+          title="Conversion rate"
+          value="4.8%"
+          subValue="completed checkouts"
+          change="↑ 0.6% vs last month"
           changeType="positive"
-          icon={<PackageCheck className="w-3.5 h-3.5 text-foreground" />}
+          icon={<PackageCheck className="w-4 h-4 text-muted-foreground" />}
         />
       </div>
 
-      {/* Orders Ledger (Responsive: Card list on mobile, Table on tablet/desktop) */}
+      {/* Orders Table */}
       <div className="bg-card border border-border rounded-lg overflow-hidden shadow-xs">
-        <div className="p-3.5 sm:p-4 border-b border-border bg-muted/40">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground font-mono">
-            Recent Store Orders
+        <div className="p-3.5 sm:p-4 border-b border-border bg-muted/30">
+          <h2 className="text-xs sm:text-sm font-semibold text-foreground">
+            Recent orders
           </h2>
         </div>
 
@@ -63,13 +63,13 @@ export const StorePage: React.FC = () => {
           {orders.map((ord) => (
             <div key={ord.id} className="p-3.5 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-foreground">{ord.order_number}</span>
+                <span className="text-xs font-semibold text-foreground">{ord.order_number}</span>
                 <StatusBadge status={ord.status} />
               </div>
               <div className="text-xs text-muted-foreground">{ord.customer_name}</div>
-              <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground pt-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
                 <span>{ord.items_count} items</span>
-                <span className="font-bold text-emerald-500 text-xs">{formatCurrency(ord.total)}</span>
+                <span className="font-semibold text-foreground">{formatCurrency(ord.total)}</span>
               </div>
             </div>
           ))}
@@ -79,28 +79,28 @@ export const StorePage: React.FC = () => {
         <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-border text-muted-foreground font-mono uppercase text-[10px] bg-muted/30">
-                <th className="py-2.5 px-4 font-medium">Order #</th>
+              <tr className="border-b border-border text-muted-foreground bg-muted/20">
+                <th className="py-2.5 px-4 font-medium">Order</th>
                 <th className="py-2.5 px-4 font-medium">Customer</th>
                 <th className="py-2.5 px-4 font-medium">Items</th>
                 <th className="py-2.5 px-4 font-medium">Total</th>
                 <th className="py-2.5 px-4 font-medium">Date</th>
-                <th className="py-2.5 px-4 font-medium text-right">Fulfillment</th>
+                <th className="py-2.5 px-4 font-medium text-right">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
               {orders.map((ord) => (
                 <tr key={ord.id} className="hover:bg-accent/40 transition-colors">
-                  <td className="py-3 px-4 font-mono font-bold text-foreground">{ord.order_number}</td>
+                  <td className="py-3 px-4 font-semibold text-foreground">{ord.order_number}</td>
                   <td className="py-3 px-4">
                     <div className="font-medium text-foreground">{ord.customer_name}</div>
-                    <div className="text-[10px] text-muted-foreground font-mono">{ord.customer_email}</div>
+                    <div className="text-xs text-muted-foreground">{ord.customer_email}</div>
                   </td>
-                  <td className="py-3 px-4 text-foreground font-mono">{ord.items_count} items</td>
-                  <td className="py-3 px-4 font-mono font-semibold text-emerald-500 tabular-nums">
+                  <td className="py-3 px-4 text-foreground">{ord.items_count} items</td>
+                  <td className="py-3 px-4 font-semibold text-foreground tabular-nums">
                     {formatCurrency(ord.total)}
                   </td>
-                  <td className="py-3 px-4 text-muted-foreground font-mono text-[11px]">
+                  <td className="py-3 px-4 text-muted-foreground">
                     {formatDateTime(ord.created_at)}
                   </td>
                   <td className="py-3 px-4 text-right">

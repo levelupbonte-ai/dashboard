@@ -1,9 +1,3 @@
-// =======================================================================
-// LEVELUP DASHBOARD - STRIPE-READY BILLING INTEGRATION ARCHITECTURE
-// Server-side authorization & checkout session creation protocol.
-// Sensitive keys must NEVER be in client-side code.
-// =======================================================================
-
 import { CarePlanTier } from '../types';
 
 export interface PlanConfig {
@@ -19,90 +13,79 @@ export interface PlanConfig {
 export const CARE_PLANS: Record<CarePlanTier, PlanConfig> = {
   none: {
     id: 'none',
-    name: 'No Care Plan',
+    name: 'No plan',
     priceMonthly: 0,
     stripePriceId: '',
-    description: 'Self-managed hosting without LevelUp maintenance SLA.',
-    highlights: ['Community documentation', 'Standard hosting SLA'],
-    recommendedFor: 'Archived or static staging projects',
+    description: 'Hosting without monthly website updates.',
+    highlights: ['Standard website hosting', 'SSL certificate'],
+    recommendedFor: 'Static websites',
   },
   essential: {
     id: 'essential',
-    name: 'Essential Care',
+    name: 'Essential',
     priceMonthly: 39,
     stripePriceId: 'price_levelup_essential_monthly',
-    description: 'Core reliability, uptime monitoring, and weekly security updates.',
+    description: 'Hosting, security updates, and daily backups.',
     highlights: [
-      'Weekly automated security & dependency updates',
-      '24/7 Uptime & SSL certificate monitoring',
-      'Daily cloud backups (30-day retention)',
-      '1 content change request per month',
-      'Standard email support (48h SLA)',
+      'Weekly security updates',
+      'Uptime and SSL monitoring',
+      'Daily backups (30-day history)',
+      '1 website update request per month',
+      'Email support (within 48 hours)',
     ],
-    recommendedFor: 'Solopreneurs & simple business websites',
+    recommendedFor: 'Standard business websites',
   },
   pro: {
     id: 'pro',
-    name: 'Pro Care',
+    name: 'Pro',
     priceMonthly: 99,
     stripePriceId: 'price_levelup_pro_monthly',
-    description: 'Active maintenance, performance audits, and high-priority turnaround.',
+    description: 'Regular website updates, form monitoring, and priority support.',
     highlights: [
-      'Everything in Essential Care',
-      'Up to 4 content & design change requests / month',
-      'Monthly Core Web Vitals speed & SEO audit',
-      'Form & booking workflow telemetry health checks',
-      'High-priority support queue (12h SLA)',
-      'Staging preview environment',
+      'Everything in Essential',
+      'Up to 4 website update requests per month',
+      'Monthly website speed and search review',
+      'Contact form and booking checks',
+      'Priority support (within 12 hours)',
+      'Preview link for changes',
     ],
-    recommendedFor: 'Growing professional businesses & booking portals',
+    recommendedFor: 'Active businesses & booking websites',
   },
   premium: {
     id: 'premium',
-    name: 'Premium Care & Growth',
+    name: 'Premium',
     priceMonthly: 199,
     stripePriceId: 'price_levelup_premium_monthly',
-    description: 'Dedicated engineering partner, unlimited minor revisions, and conversion optimization.',
+    description: 'Unlimited content updates and fastest response times.',
     highlights: [
-      'Everything in Pro Care',
-      'Unlimited minor content & asset updates',
-      'Quarterly conversion rate & landing page optimization',
-      'Dedicated Slack/Teams engineering channel',
-      'Urgent bug hotfix guarantee (4h SLA)',
-      'Custom API & e-commerce checkout telemetry',
+      'Everything in Pro',
+      'Unlimited content and text updates',
+      'Quarterly website review',
+      'Direct support channel',
+      'Same-day urgent fixes (within 4 hours)',
+      'Online store and checkout monitoring',
     ],
-    recommendedFor: 'High-traffic e-commerce & mission-critical corporate platforms',
+    recommendedFor: 'Online stores & high-traffic businesses',
   },
 };
 
 export const stripeService = {
-  /**
-   * Generates a Stripe Customer Portal redirect URL.
-   * In a live deployment, this calls your Next.js / Express backend endpoint
-   * POST /api/billing/create-portal-session with user JWT.
-   */
   createCustomerPortalSession: async (tenantId: string, stripeCustomerId?: string): Promise<{ url: string }> => {
-    // Architectural pattern: Client invokes server endpoint, server queries Stripe with secret key
     if (!stripeCustomerId) {
-      throw new Error('Tenant has no attached Stripe Customer ID. Contact LevelUp billing.');
+      throw new Error('No billing account found for this organization.');
     }
-    // Simulation for preview sandbox
     return {
       url: `https://billing.stripe.com/p/session/test_${tenantId}_${Date.now()}`,
     };
   },
 
-  /**
-   * Initiates a Stripe Checkout session for plan upgrades.
-   * Server validates tenant session and generates session URL with line_items.
-   */
   createCheckoutSession: async (
     tenantId: string,
     tier: CarePlanTier
   ): Promise<{ checkoutUrl: string; sessionId: string }> => {
     const plan = CARE_PLANS[tier];
     if (!plan || !plan.stripePriceId) {
-      throw new Error(`Invalid plan tier selected: ${tier}`);
+      throw new Error(`Invalid plan selected: ${tier}`);
     }
 
     return {

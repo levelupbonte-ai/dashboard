@@ -23,7 +23,7 @@ export const ShadcnHeader: React.FC<ShadcnHeaderProps> = ({
   unreadCount,
   onNavigateTab,
 }) => {
-  const { role } = useAuth();
+  const { orgRole } = useAuth();
 
   return (
     <header className="h-14 border-b border-border bg-background/80 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between gap-3 sticky top-0 z-30 shrink-0">
@@ -43,13 +43,13 @@ export const ShadcnHeader: React.FC<ShadcnHeaderProps> = ({
         <Breadcrumbs activeTab={activeTab} />
       </div>
 
-      {/* Right: Search, Role Switcher, Notification, Theme, Mode */}
+      {/* Right: Search, Role Badge, Notification, Theme, Mode */}
       <div className="flex items-center gap-2 shrink-0">
         <SearchInput onClick={onOpenSearch} />
 
-        {/* Role Badge (Desktop only) */}
-        <div className="hidden lg:flex items-center px-2 py-1 rounded-md bg-muted/60 border border-border/80 text-[10px] font-mono text-muted-foreground">
-          <span className="uppercase font-semibold tracking-wider">{role}</span>
+        {/* Organization Role Badge (Desktop only) */}
+        <div className="hidden lg:flex items-center px-2.5 py-1 rounded-md bg-muted/60 border border-border/80 text-[10px] font-mono text-muted-foreground">
+          <span className="uppercase font-semibold tracking-wider text-foreground">{orgRole}</span>
         </div>
 
         <ThemeModeToggle />

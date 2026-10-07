@@ -1,8 +1,36 @@
 // =======================================================================
 // LEVELUP DASHBOARD - TYPE SYSTEM & DOMAIN DEFINITIONS
+// Client-Only Multi-Tenant Organization Architecture
 // =======================================================================
 
+export type OrganizationRole = 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER';
+
+// Legacy alias kept for message sender tagging ('client' vs LevelUp support staff 'support_engineer')
 export type UserRole = 'client' | 'admin' | 'super_admin';
+
+export type Permission =
+  | 'organization.view'
+  | 'organization.update'
+  | 'organization.delete'
+  | 'team.view'
+  | 'team.invite'
+  | 'team.update'
+  | 'team.remove'
+  | 'website.view'
+  | 'website.update'
+  | 'website.delete'
+  | 'analytics.view'
+  | 'leads.view'
+  | 'leads.manage'
+  | 'bookings.view'
+  | 'bookings.manage'
+  | 'requests.create'
+  | 'requests.view'
+  | 'requests.manage'
+  | 'billing.view'
+  | 'billing.manage'
+  | 'support.create'
+  | 'support.view';
 
 export type CarePlanTier = 'none' | 'essential' | 'pro' | 'premium';
 
@@ -24,6 +52,8 @@ export interface Tenant {
   logo_url?: string;
   care_plan: CarePlanTier;
   stripe_customer_id?: string;
+  stripe_subscription_id?: string;
+  subscription_status?: 'active' | 'past_due' | 'canceled' | 'trialing';
   features: TenantFeatures;
   created_at: string;
 }
@@ -34,7 +64,46 @@ export interface UserProfile {
   email: string;
   full_name: string;
   role: UserRole;
+  org_role: OrganizationRole;
+  mfa_enabled?: boolean;
   avatar_url?: string;
+}
+
+export interface OrganizationMember {
+  id: string;
+  organization_id: string;
+  full_name: string;
+  email: string;
+  org_role: OrganizationRole;
+  title?: string;
+  mfa_enabled: boolean;
+  status: 'active' | 'suspended';
+  joined_at: string;
+  last_active_at: string;
+}
+
+export interface OrganizationInvitation {
+  id: string;
+  organization_id: string;
+  email: string;
+  org_role: OrganizationRole;
+  invited_by_name: string;
+  token_preview: string;
+  status: 'pending' | 'accepted' | 'expired' | 'revoked';
+  created_at: string;
+  expires_at: string;
+}
+
+export interface OrganizationActivityItem {
+  id: string;
+  organization_id: string;
+  actor_name: string;
+  actor_email: string;
+  actor_role: OrganizationRole;
+  action: string;
+  target: string;
+  category: 'team' | 'website' | 'request' | 'billing' | 'security' | 'support';
+  created_at: string;
 }
 
 export interface Website {

@@ -8,16 +8,14 @@ import {
   CalendarDays,
   ShoppingBag,
   LineChart,
-  Activity,
   SearchCode,
   CreditCard,
   ShieldCheck,
   LifeBuoy,
   Settings,
-  Layers,
-  Server,
   ChevronLeft,
   ChevronRight,
+  UserCheck,
 } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
 import { useAuth } from '../../context/AuthContext';
@@ -42,20 +40,29 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
   pendingRequestsCount,
   onOpenNotifications,
 }) => {
-  const { hasBookings, hasEcommerce, hasSeo, hasCarePlan } = useTenant();
-  const { isAdmin } = useAuth();
+  const { currentTenant, hasBookings, hasEcommerce, hasSeo, hasCarePlan } = useTenant();
+  const { can } = useAuth();
 
-  // Navigation grouping inspired by next-shadcn-dashboard-starter / nav-config.ts
+  const canViewBilling = can('billing.view');
+  const isMedical = currentTenant.slug === 'lumina-health';
+  const isHospitality = currentTenant.slug === 'velvet-vine';
+
+  const enquiriesLabel = isMedical ? 'Patient enquiries' : 'New enquiries';
+  const bookingsLabel = isHospitality ? 'Reservations' : 'Appointments';
+
+  // Client-Only Organization Navigation Structure
   const navGroups = [
     {
-      label: 'Platform',
+      label: 'Overview',
+      items: [{ id: 'overview', title: 'Overview', icon: LayoutDashboard }],
+    },
+    {
+      label: 'Website',
       items: [
-        { id: 'overview', title: 'Overview', icon: LayoutDashboard },
-        { id: 'websites', title: 'My Websites', icon: Globe },
-        { id: 'performance', title: 'Performance', icon: Gauge },
+        { id: 'websites', title: 'My websites', icon: Globe },
         {
           id: 'requests',
-          title: 'Requests',
+          title: 'Open requests',
           icon: FileCode2,
           badge: pendingRequestsCount > 0 ? `${pendingRequestsCount}` : undefined,
         },
@@ -64,46 +71,41 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
     {
       label: 'Business',
       items: [
-        { id: 'leads', title: 'Leads', icon: Users2 },
-        ...(hasBookings ? [{ id: 'bookings', title: 'Bookings', icon: CalendarDays }] : []),
-        ...(hasEcommerce ? [{ id: 'store', title: 'Store & Orders', icon: ShoppingBag }] : []),
+        { id: 'leads', title: enquiriesLabel, icon: Users2 },
+        ...(hasBookings ? [{ id: 'bookings', title: bookingsLabel, icon: CalendarDays }] : []),
+        ...(hasEcommerce ? [{ id: 'store', title: 'Orders', icon: ShoppingBag }] : []),
       ],
     },
     {
-      label: 'Telemetry',
+      label: 'Performance',
       items: [
-        { id: 'analytics', title: 'Analytics', icon: LineChart },
-        { id: 'traffic', title: 'Traffic', icon: Activity },
-        ...(hasSeo ? [{ id: 'seo', title: 'Search Visibility', icon: SearchCode }] : []),
+        { id: 'analytics', title: 'Website traffic', icon: LineChart },
+        ...(hasSeo ? [{ id: 'seo', title: 'Search visibility', icon: SearchCode }] : []),
+        { id: 'performance', title: 'Website performance', icon: Gauge },
       ],
     },
-    {
-      label: 'Finance & Care',
-      items: [
-        { id: 'billing', title: 'Billing & Plans', icon: CreditCard },
-        ...(hasCarePlan ? [{ id: 'care', title: 'Website Care', icon: ShieldCheck }] : []),
-      ],
-    },
-    {
-      label: 'Help & Config',
-      items: [
-        { id: 'support', title: 'Support Desk', icon: LifeBuoy },
-        { id: 'settings', title: 'Settings', icon: Settings },
-      ],
-    },
-    ...(isAdmin
+    ...(canViewBilling
       ? [
           {
-            label: 'Agency Master',
+            label: 'Billing',
             items: [
-              { id: 'admin-overview', title: 'Agency Portal', icon: Layers },
-              { id: 'admin-clients', title: 'Client Roster & Flags', icon: Users2 },
-              { id: 'admin-requests', title: 'Cross-Tenant Queue', icon: FileCode2 },
-              { id: 'admin-audit', title: 'Security Audit Log', icon: Server },
+              { id: 'billing', title: 'Billing', icon: CreditCard },
+              ...(hasCarePlan ? [{ id: 'care', title: 'Subscription', icon: ShieldCheck }] : []),
             ],
           },
         ]
       : []),
+    {
+      label: 'Team',
+      items: [{ id: 'team', title: 'Team', icon: UserCheck }],
+    },
+    {
+      label: 'Account',
+      items: [
+        { id: 'support', title: 'Support', icon: LifeBuoy },
+        { id: 'settings', title: 'Settings', icon: Settings },
+      ],
+    },
   ];
 
   return (
@@ -148,7 +150,9 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
                     <Icon
                       className={cn(
                         'size-4 shrink-0 transition-colors',
-                        isActive ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
+                        isActive
+                          ? 'text-foreground'
+                          : 'text-muted-foreground group-hover:text-foreground'
                       )}
                     />
 

@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import {
   LifeBuoy,
   PlusCircle,
-  MessageSquare,
   Send,
-  Clock,
   ArrowRight,
-  ShieldCheck,
+  Clock,
 } from 'lucide-react';
 import { useTenant } from '../../../context/TenantContext';
 import { useAuth } from '../../../context/AuthContext';
@@ -30,7 +28,7 @@ export const SupportPage: React.FC = () => {
 
   // New ticket state
   const [subject, setSubject] = useState('');
-  const [category, setCategory] = useState('Technical Issue');
+  const [category, setCategory] = useState('Website issue');
   const [priority, setPriority] = useState<RequestPriority>('medium');
   const [initialMessage, setInitialMessage] = useState('');
 
@@ -81,9 +79,9 @@ export const SupportPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-border">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Support Desk</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Support</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Direct communication channel with LevelUp engineers and system architects.
+            Get help with your website, domain, or account
           </p>
         </div>
         <Button
@@ -92,23 +90,23 @@ export const SupportPage: React.FC = () => {
           onClick={() => setIsNewTicketOpen(true)}
           icon={<PlusCircle className="size-3.5" />}
         >
-          Open Ticket
+          Contact support
         </Button>
       </div>
 
-      {/* Support SLA Banner */}
+      {/* Response time info */}
       <div className="p-3.5 rounded-lg border border-border bg-card flex items-center justify-between text-xs text-foreground">
         <div className="flex items-center gap-2.5">
-          <ShieldCheck className="size-4 text-emerald-500 shrink-0" />
+          <Clock className="size-4 text-muted-foreground shrink-0" />
           <div>
-            <span className="font-semibold text-foreground">Care Plan SLA</span>
-            <span className="text-muted-foreground ml-2">
-              Assigned directly to on-call LevelUp engineering pods.
+            <span className="font-medium text-foreground">Support hours:</span>
+            <span className="text-muted-foreground ml-1.5">
+              Monday to Friday, 9:00 AM – 6:00 PM
             </span>
           </div>
         </div>
-        <div className="font-mono text-emerald-500 font-semibold text-[11px] hidden md:block">
-          Target SLA &lt; 12h
+        <div className="text-muted-foreground hidden md:block">
+          Typical response: under 12 hours
         </div>
       </div>
 
@@ -116,9 +114,9 @@ export const SupportPage: React.FC = () => {
       {tickets.length === 0 ? (
         <EmptyState
           icon={<LifeBuoy className="size-6 text-foreground" />}
-          title="No open tickets"
-          description="Everything operational. Open a ticket if you need technical support."
-          actionLabel="Open a Ticket"
+          title="No support messages"
+          description="Send a message if you need help with your website or billing."
+          actionLabel="Contact support"
           onAction={() => setIsNewTicketOpen(true)}
         />
       ) : (
@@ -135,22 +133,20 @@ export const SupportPage: React.FC = () => {
                     {t.subject}
                   </span>
                   <StatusBadge status={t.status} />
-                  <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                  <span className="text-xs text-muted-foreground">
                     {t.category}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono">
-                  <span>#{t.id}</span>
-                  <span>·</span>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>Updated {formatTimeAgo(t.updated_at)}</span>
                   <span>·</span>
-                  <span>{t.messages.length} replies</span>
+                  <span>{t.messages.length} messages</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0 self-end sm:self-center">
-                <span className="text-[11px] font-mono hidden sm:inline">Thread</span>
+                <span className="hidden sm:inline">View</span>
                 <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform text-muted-foreground" />
               </div>
             </div>
@@ -158,18 +154,18 @@ export const SupportPage: React.FC = () => {
         </div>
       )}
 
-      {/* New Ticket Modal */}
+      {/* New Support Message Modal */}
       <Modal
         isOpen={isNewTicketOpen}
         onClose={() => setIsNewTicketOpen(false)}
-        title="Open Support Ticket"
-        description="Submit an inquiry to LevelUp engineering."
+        title="Contact support"
+        description="Send a message to our support team."
         maxWidth="md"
       >
         <form onSubmit={handleCreateTicket} className="space-y-3.5">
           <Input
             label="Subject"
-            placeholder="e.g., Assistance configuring domain DNS for Google Workspace"
+            placeholder="e.g., Question about domain email setup"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             required
@@ -177,17 +173,17 @@ export const SupportPage: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Category</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Topic</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full bg-card border border-border rounded-md px-3 py-2 text-xs text-foreground focus:outline-none focus:border-border min-h-[38px]"
               >
-                <option value="Technical Issue">Technical Issue</option>
-                <option value="DNS & Domain">DNS & Domain</option>
-                <option value="Email Configuration">Email Configuration</option>
-                <option value="Billing & Invoicing">Billing & Invoicing</option>
-                <option value="General Question">General Question</option>
+                <option value="Website issue">Website issue</option>
+                <option value="Domain & DNS">Domain & DNS</option>
+                <option value="Email setup">Email setup</option>
+                <option value="Billing">Billing</option>
+                <option value="General question">General question</option>
               </select>
             </div>
 
@@ -199,7 +195,7 @@ export const SupportPage: React.FC = () => {
                 className="w-full bg-card border border-border rounded-md px-3 py-2 text-xs text-foreground focus:outline-none focus:border-border min-h-[38px]"
               >
                 <option value="low">Low</option>
-                <option value="medium">Medium</option>
+                <option value="medium">Normal</option>
                 <option value="high">High</option>
                 <option value="urgent">Urgent</option>
               </select>
@@ -208,7 +204,7 @@ export const SupportPage: React.FC = () => {
 
           <Textarea
             label="Message"
-            placeholder="Provide context or error messages..."
+            placeholder="How can we help?"
             rows={4}
             value={initialMessage}
             onChange={(e) => setInitialMessage(e.target.value)}
@@ -225,7 +221,7 @@ export const SupportPage: React.FC = () => {
               Cancel
             </Button>
             <Button type="submit" variant="primary" size="sm">
-              Submit Ticket
+              Send message
             </Button>
           </div>
         </form>
@@ -237,20 +233,20 @@ export const SupportPage: React.FC = () => {
           isOpen={Boolean(selectedTicket)}
           onClose={() => setSelectedTicket(null)}
           title={selectedTicket.subject}
-          subtitle={`#${selectedTicket.id} · Priority: ${selectedTicket.priority.toUpperCase()}`}
+          subtitle={selectedTicket.category}
           width="lg"
         >
           <div className="space-y-5">
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border">
-              <div className="text-xs text-foreground font-mono">
-                Category: <strong>{selectedTicket.category}</strong>
+              <div className="text-xs text-foreground">
+                Topic: <strong>{selectedTicket.category}</strong>
               </div>
               <StatusBadge status={selectedTicket.status} />
             </div>
 
             <div className="space-y-3">
-              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider font-mono">
-                Conversation History
+              <h3 className="text-xs font-medium text-muted-foreground">
+                Messages
               </h3>
 
               <div className="space-y-2.5">
@@ -263,16 +259,16 @@ export const SupportPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-foreground">{m.sender_name}</span>
                         <span
-                          className={`px-1.5 py-0.5 text-[9px] font-mono rounded ${
+                          className={`px-1.5 py-0.5 text-[10px] rounded ${
                             m.sender_role === 'admin'
-                              ? 'bg-primary text-primary-foreground font-semibold'
+                              ? 'bg-primary text-primary-foreground font-medium'
                               : 'bg-muted text-muted-foreground'
                           }`}
                         >
-                          {m.sender_role === 'admin' ? 'Staff' : 'Client'}
+                          {m.sender_role === 'admin' ? 'Support' : 'You'}
                         </span>
                       </div>
-                      <span className="text-[10px] text-muted-foreground font-mono">
+                      <span className="text-xs text-muted-foreground">
                         {formatTimeAgo(m.created_at)}
                       </span>
                     </div>
@@ -284,7 +280,7 @@ export const SupportPage: React.FC = () => {
               {/* Reply form */}
               <form onSubmit={handleSendReply} className="pt-2 space-y-2">
                 <Textarea
-                  placeholder={`Reply as ${user.full_name}...`}
+                  placeholder="Write a reply..."
                   rows={3}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
@@ -297,7 +293,7 @@ export const SupportPage: React.FC = () => {
                     icon={<Send className="size-3.5" />}
                     disabled={!replyText.trim()}
                   >
-                    Send Reply
+                    Send reply
                   </Button>
                 </div>
               </form>

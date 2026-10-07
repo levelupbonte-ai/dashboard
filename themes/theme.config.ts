@@ -22,10 +22,6 @@ export const THEMES = [
     value: 'vercel'
   },
   {
-    name: 'Mono',
-    value: 'mono'
-  },
-  {
     name: 'Notebook',
     value: 'notebook'
   },
@@ -44,5 +40,13 @@ export const THEMES = [
   {
     name: 'WhatsApp',
     value: 'whatsapp'
+  },
+  {
+    name: 'Instagram',
+    value: 'instagram'
+  },
+  {
+    name: 'Gmail',
+    value: 'gmail'
   }
 ];

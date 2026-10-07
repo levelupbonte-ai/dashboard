@@ -8,41 +8,40 @@ interface BreadcrumbsProps {
 export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ activeTab }) => {
   const { currentTenant } = useTenant();
 
+  const isMedical = currentTenant.slug === 'lumina-health';
+  const isHospitality = currentTenant.slug === 'velvet-vine';
+
   const getTabTitle = (tab: string) => {
     switch (tab) {
       case 'overview':
         return 'Overview';
       case 'websites':
-        return 'My Websites';
+        return 'My websites';
       case 'performance':
-        return 'Performance';
+        return 'Website performance';
       case 'requests':
-        return 'Requests';
+        return 'Open requests';
       case 'leads':
-        return 'Leads';
+        return isMedical ? 'Patient enquiries' : 'New enquiries';
       case 'bookings':
-        return 'Bookings';
+        return isHospitality ? 'Reservations' : 'Appointments';
       case 'store':
-        return 'Store & Orders';
+        return 'Orders';
       case 'analytics':
-        return 'Analytics';
       case 'traffic':
-        return 'Traffic';
+        return 'Website traffic';
       case 'seo':
-        return 'Search Visibility';
+        return 'Search visibility';
       case 'billing':
         return 'Billing';
       case 'care':
-        return 'Website Care';
+        return 'Subscription';
+      case 'team':
+        return 'Team';
       case 'support':
         return 'Support';
       case 'settings':
         return 'Settings';
-      case 'admin-overview':
-      case 'admin-clients':
-      case 'admin-requests':
-      case 'admin-audit':
-        return 'Agency Admin';
       default:
         return 'Overview';
     }

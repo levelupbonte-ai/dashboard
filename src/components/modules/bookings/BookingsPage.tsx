@@ -4,15 +4,9 @@ import {
   Clock,
   User,
   PlusCircle,
-  Calendar,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  Sparkles,
 } from 'lucide-react';
 import { useTenant } from '../../../context/TenantContext';
 import { dataService } from '../../../services/dataService';
-import { Booking, BookingStatus } from '../../../types';
 import { Button } from '../../ui/Button';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Modal } from '../../ui/Modal';
@@ -26,10 +20,16 @@ export const BookingsPage: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'completed' | 'cancelled'>('upcoming');
   const [isNewBookingModalOpen, setIsNewBookingModalOpen] = useState(false);
 
+  const isHospitality = currentTenant.slug === 'velvet-vine';
+  const pageTitle = isHospitality ? 'Reservations' : 'Appointments';
+  const singularLabel = isHospitality ? 'reservation' : 'appointment';
+
   // New Booking form
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
-  const [serviceName, setServiceName] = useState('Consultation Appointment');
+  const [serviceName, setServiceName] = useState(
+    isHospitality ? 'Dinner Reservation (4 guests)' : 'Initial Consultation'
+  );
   const [bookingTime, setBookingTime] = useState('');
   const [price, setPrice] = useState('250');
 
@@ -63,14 +63,23 @@ export const BookingsPage: React.FC = () => {
     setBookingTime('');
   };
 
+  const tabLabels: Record<'upcoming' | 'completed' | 'cancelled' | 'all', string> = {
+    upcoming: `Upcoming ${pageTitle.toLowerCase()}`,
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+    all: 'All',
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-border">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Bookings & Schedule</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
+            {pageTitle}
+          </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Appointment flow synchronized with client booking widgets.
+            {pageTitle} booked through {currentTenant.name}
           </p>
         </div>
         <Button
@@ -79,26 +88,8 @@ export const BookingsPage: React.FC = () => {
           onClick={() => setIsNewBookingModalOpen(true)}
           icon={<PlusCircle className="w-3.5 h-3.5" />}
         >
-          Schedule Appointment
+          Add {singularLabel}
         </Button>
-      </div>
-
-      {/* Integration Readiness Banner */}
-      <div className="p-3.5 rounded-lg border border-border bg-card flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded bg-muted border border-border flex items-center justify-center text-foreground">
-            <Calendar className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="text-xs font-semibold text-foreground flex items-center gap-2 font-mono">
-              <span>CALENDAR WEBHOOK ENDPOINT</span>
-              <span className="text-[10px] text-emerald-500 font-bold">ACTIVE</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              Two-way sync architecture for Google Calendar, Outlook, and automated SMS alerts.
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Filter Tabs */}
@@ -107,24 +98,24 @@ export const BookingsPage: React.FC = () => {
           <button
             key={tab}
             onClick={() => setFilter(tab)}
-            className={`px-3 py-1.5 text-xs font-medium capitalize rounded-md transition-colors min-h-[36px] ${
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors min-h-[36px] ${
               filter === tab
                 ? 'bg-accent text-accent-foreground font-semibold shadow-2xs'
                 : 'text-muted-foreground hover:text-foreground hover:bg-accent/40'
             }`}
           >
-            {tab}
+            {tabLabels[tab]}
           </button>
         ))}
       </div>
 
-      {/* Bookings List (1 col mobile, 2 col tablet, 3 col desktop) */}
+      {/* Appointments List */}
       {filteredBookings.length === 0 ? (
         <EmptyState
           icon={<CalendarDays className="w-6 h-6 text-foreground" />}
-          title="No bookings in this view"
-          description="Appointments booked through your website's scheduling system will appear here."
-          actionLabel="Add Appointment"
+          title={`No ${pageTitle.toLowerCase()} yet`}
+          description={`${pageTitle} booked on your website will appear here.`}
+          actionLabel={`Add ${singularLabel}`}
           onAction={() => setIsNewBookingModalOpen(true)}
         />
       ) : (
@@ -139,8 +130,8 @@ export const BookingsPage: React.FC = () => {
                   <h3 className="text-xs sm:text-sm font-semibold text-foreground tracking-tight">
                     {b.service_name}
                   </h3>
-                  <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5 font-mono">
-                    <Clock className="w-3 h-3 text-muted-foreground" />
+                  <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                    <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                     <span>{formatDateTime(b.booking_time)}</span>
                   </div>
                 </div>
@@ -149,22 +140,22 @@ export const BookingsPage: React.FC = () => {
 
               <div className="p-2.5 rounded bg-muted/40 border border-border text-xs space-y-0.5">
                 <div className="font-medium text-foreground flex items-center gap-1.5">
-                  <User className="w-3 h-3 text-muted-foreground" />
+                  <User className="w-3.5 h-3.5 text-muted-foreground" />
                   <span>{b.customer_name}</span>
                 </div>
-                <div className="text-muted-foreground font-mono text-[11px] truncate">
+                <div className="text-muted-foreground truncate">
                   {b.customer_email}
                 </div>
                 {b.customer_phone && (
-                  <div className="text-muted-foreground font-mono text-[10px]">
+                  <div className="text-muted-foreground">
                     {b.customer_phone}
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border font-mono">
-                <span>Fee</span>
-                <span className="font-bold text-emerald-500 tabular-nums">
+              <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border">
+                <span>Amount</span>
+                <span className="font-semibold text-foreground tabular-nums">
                   {formatCurrency(b.price)}
                 </span>
               </div>
@@ -173,24 +164,24 @@ export const BookingsPage: React.FC = () => {
         </div>
       )}
 
-      {/* New Booking Modal */}
+      {/* New Appointment Modal */}
       <Modal
         isOpen={isNewBookingModalOpen}
         onClose={() => setIsNewBookingModalOpen(false)}
-        title="Schedule Appointment"
-        description="Book a client directly into the schedule."
+        title={`Add ${singularLabel}`}
+        description={`Schedule a new ${singularLabel} for ${currentTenant.name}.`}
         maxWidth="md"
       >
         <form onSubmit={handleCreateBooking} className="space-y-3.5">
           <Input
-            label="Client Full Name"
+            label="Full name"
             placeholder="e.g., Victoria Adams"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
             required
           />
           <Input
-            label="Client Email"
+            label="Email address"
             type="email"
             placeholder="client@domain.com"
             value={customerEmail}
@@ -198,21 +189,21 @@ export const BookingsPage: React.FC = () => {
             required
           />
           <Input
-            label="Service / Appointment Type"
+            label="Service"
             value={serviceName}
             onChange={(e) => setServiceName(e.target.value)}
             required
           />
           <div className="grid grid-cols-2 gap-3">
             <Input
-              label="Date & Time"
+              label="Date & time"
               type="datetime-local"
               value={bookingTime}
               onChange={(e) => setBookingTime(e.target.value)}
               required
             />
             <Input
-              label="Fee ($)"
+              label="Amount ($)"
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
@@ -230,7 +221,7 @@ export const BookingsPage: React.FC = () => {
               Cancel
             </Button>
             <Button type="submit" variant="primary" size="sm">
-              Confirm Booking
+              Save {singularLabel}
             </Button>
           </div>
         </form>

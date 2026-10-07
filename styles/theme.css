@@ -9,6 +9,8 @@
 @import './themes/zen.css';
 @import './themes/astro-vista.css';
 @import './themes/whatsapp.css';
+@import './themes/instagram.css';
+@import './themes/gmail.css';
 
 body {
   @apply overscroll-none;

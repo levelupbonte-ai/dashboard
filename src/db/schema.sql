@@ -7,6 +7,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. ENUMS
+CREATE TYPE organization_role AS ENUM ('OWNER', 'ADMIN', 'MEMBER', 'VIEWER');
 CREATE TYPE user_role AS ENUM ('client', 'admin', 'super_admin');
 CREATE TYPE request_status AS ENUM ('submitted', 'in_review', 'in_progress', 'waiting_for_client', 'completed');
 CREATE TYPE request_priority AS ENUM ('low', 'medium', 'high', 'urgent');
@@ -17,7 +18,7 @@ CREATE TYPE care_plan_tier AS ENUM ('none', 'essential', 'pro', 'premium');
 CREATE TYPE invoice_status AS ENUM ('draft', 'open', 'paid', 'uncollectible', 'void');
 CREATE TYPE ticket_status AS ENUM ('open', 'in_progress', 'waiting', 'resolved');
 
--- 2. TENANTS TABLE (Each client organization is a tenant)
+-- 2. ORGANIZATIONS / TENANTS TABLE (Primary Tenant Boundary)
 CREATE TABLE tenants (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
@@ -31,17 +32,58 @@ CREATE TABLE tenants (
     is_active BOOLEAN DEFAULT TRUE
 );
 
--- 3. PROFILES / MEMBERS TABLE (Linked to auth.users in Supabase)
+-- 3. PROFILES TABLE (Linked to auth.users in Supabase)
 CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
     email TEXT NOT NULL,
     full_name TEXT NOT NULL,
     role user_role DEFAULT 'client',
+    org_role organization_role DEFAULT 'MEMBER',
+    mfa_enabled BOOLEAN DEFAULT FALSE,
     avatar_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+);
+
+-- 3B. ORGANIZATION MEMBERS TABLE (Multi-user organization membership + role)
+CREATE TABLE organization_members (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    org_role organization_role NOT NULL DEFAULT 'MEMBER',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (organization_id, user_id)
+);
+
+-- 3C. ORGANIZATION INVITATIONS TABLE (Single-use, expiring, org-bound tokens)
+CREATE TABLE organization_invitations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    email TEXT NOT NULL,
+    org_role organization_role NOT NULL DEFAULT 'MEMBER',
+    token_hash TEXT UNIQUE NOT NULL,
+    invited_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    status TEXT NOT NULL DEFAULT 'pending', -- pending, accepted, expired, revoked
+    expires_at TIMESTAMPTZ NOT NULL,
+    accepted_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3D. SUBSCRIPTIONS TABLE (Organization-scoped Stripe billing; NO raw card storage)
+CREATE TABLE subscriptions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE UNIQUE,
+    stripe_customer_id TEXT NOT NULL,
+    stripe_subscription_id TEXT UNIQUE NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    plan_id care_plan_tier NOT NULL DEFAULT 'pro',
+    current_period_start TIMESTAMPTZ,
+    current_period_end TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 4. WEBSITES TABLE (One tenant can have multiple websites)

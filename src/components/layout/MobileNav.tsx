@@ -14,7 +14,7 @@ import {
   ShoppingBag,
   LineChart,
   SearchCode,
-  Layers,
+  UserCheck,
 } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
 import { useAuth } from '../../context/AuthContext';
@@ -41,7 +41,14 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   onOpen,
 }) => {
   const { currentTenant, hasBookings, hasEcommerce, hasSeo, hasCarePlan } = useTenant();
-  const { isAdmin } = useAuth();
+  const { can } = useAuth();
+
+  const canViewBilling = can('billing.view');
+  const isMedical = currentTenant.slug === 'lumina-health';
+  const isHospitality = currentTenant.slug === 'velvet-vine';
+
+  const enquiriesLabel = isMedical ? 'Patient enquiries' : 'New enquiries';
+  const bookingsLabel = isHospitality ? 'Reservations' : 'Appointments';
 
   const primaryTabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -52,72 +59,70 @@ export const MobileNav: React.FC<MobileNavProps> = ({
       icon: FileCode2,
       badge: pendingRequestsCount > 0 ? `${pendingRequestsCount}` : undefined,
     },
-    { id: 'leads', label: 'Leads', icon: Users2 },
+    { id: 'team', label: 'Team', icon: UserCheck },
   ];
 
   const sections = [
     {
-      title: 'PLATFORM',
+      title: 'OVERVIEW & WEBSITE',
       items: [
         { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-        { id: 'websites', label: 'My Websites', icon: Globe },
+        { id: 'websites', label: 'My websites', icon: Globe },
         {
           id: 'requests',
-          label: 'Website Requests',
+          label: 'Open requests',
           icon: FileCode2,
           badge: pendingRequestsCount > 0 ? `${pendingRequestsCount}` : undefined,
         },
       ],
     },
     {
-      title: 'BUSINESS & ENGAGEMENT',
+      title: 'BUSINESS',
       items: [
-        { id: 'leads', label: 'Leads & Inquiries', icon: Users2 },
+        { id: 'leads', label: enquiriesLabel, icon: Users2 },
         ...(hasBookings
-          ? [{ id: 'bookings', label: 'Bookings & Appointments', icon: CalendarDays }]
+          ? [{ id: 'bookings', label: bookingsLabel, icon: CalendarDays }]
           : []),
         ...(hasEcommerce
-          ? [{ id: 'store', label: 'Store & Orders', icon: ShoppingBag }]
+          ? [{ id: 'store', label: 'Orders', icon: ShoppingBag }]
           : []),
       ],
     },
     {
-      title: 'TELEMETRY & FINANCE',
+      title: 'PERFORMANCE & TEAM',
       items: [
-        { id: 'analytics', label: 'Analytics & Traffic', icon: LineChart },
+        { id: 'analytics', label: 'Website traffic', icon: LineChart },
         ...(hasSeo
-          ? [{ id: 'seo', label: 'Search Visibility (SEO)', icon: SearchCode }]
+          ? [{ id: 'seo', label: 'Search visibility', icon: SearchCode }]
           : []),
-        { id: 'billing', label: 'Billing & Plans', icon: CreditCard },
-        ...(hasCarePlan
-          ? [{ id: 'care', label: 'Website Care Plans', icon: ShieldCheck }]
-          : []),
+        { id: 'team', label: 'Team', icon: UserCheck },
       ],
     },
-    {
-      title: 'PREFERENCES',
-      items: [
-        { id: 'support', label: 'Support Desk', icon: LifeBuoy },
-        { id: 'settings', label: 'Settings & Security', icon: Settings },
-      ],
-    },
-    ...(isAdmin
+    ...(canViewBilling
       ? [
           {
-            title: 'AGENCY MASTER',
+            title: 'BILLING',
             items: [
-              { id: 'admin-overview', label: 'Agency Master Portal', icon: Layers },
-              { id: 'admin-clients', label: 'Client Accounts & Flags', icon: Users2 },
-              { id: 'admin-requests', label: 'Cross-Tenant Queue', icon: FileCode2 },
+              { id: 'billing', label: 'Billing', icon: CreditCard },
+              ...(hasCarePlan
+                ? [{ id: 'care', label: 'Subscription', icon: ShieldCheck }]
+                : []),
             ],
           },
         ]
       : []),
+    {
+      title: 'ACCOUNT',
+      items: [
+        { id: 'support', label: 'Support', icon: LifeBuoy },
+        { id: 'settings', label: 'Settings', icon: Settings },
+      ],
+    },
   ];
 
   return (
     <>
-      {/* Vercel/Cloudflare Clean Bottom App Bar on Mobile */}
+      {/* Clean Bottom App Bar on Mobile */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 h-14 bg-background/95 backdrop-blur-md border-t border-border px-1 flex items-center justify-around z-40 select-none pb-safe">
         {primaryTabs.map((tab) => {
           const Icon = tab.icon;
@@ -179,7 +184,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                     {currentTenant.name}
                   </div>
                   <div className="text-[10px] font-mono text-muted-foreground">
-                    LevelUp Dashboard
+                    Client Organization Workspace
                   </div>
                 </div>
               </div>
@@ -231,7 +236,12 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                         )}
                       >
                         <div className="flex items-center gap-2.5 truncate">
-                          <Icon className={cn('size-4', isActive ? 'text-foreground' : 'text-muted-foreground')} />
+                          <Icon
+                            className={cn(
+                              'size-4',
+                              isActive ? 'text-foreground' : 'text-muted-foreground'
+                            )}
+                          />
                           <span className="truncate">{item.label}</span>
                         </div>
                         {item.badge && (
@@ -247,9 +257,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="pt-3 border-t border-border text-[11px] text-muted-foreground flex items-center justify-between font-mono">
-              <span>{currentTenant.slug}</span>
-              <span className="text-emerald-500 uppercase font-bold text-[10px]">Active</span>
+            <div className="pt-3 border-t border-border text-xs text-muted-foreground flex items-center justify-between">
+              <span>{currentTenant.name}</span>
+              <span className="text-emerald-500 font-medium text-xs">Online</span>
             </div>
           </div>
         </div>

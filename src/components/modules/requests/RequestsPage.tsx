@@ -132,38 +132,38 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">Website Requests</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">Open requests</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Submit modifications, copy revisions, and design tickets tracked under your Care Plan SLA.
+            Submit and track updates for your website.
           </p>
         </div>
 
-        {/* View mode toggle (Kiranism Kanban vs Table) + Action button */}
+        {/* View mode toggle + Action button */}
         <div className="flex items-center gap-2">
           <div className="flex items-center p-0.5 rounded-lg border border-border bg-card">
             <button
               onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-md text-xs font-mono transition-colors flex items-center gap-1.5 ${
+              className={`p-1.5 rounded-md text-xs transition-colors flex items-center gap-1.5 ${
                 viewMode === 'table'
                   ? 'bg-muted text-foreground font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
-              title="Table View"
+              title="List view"
             >
               <TableIcon className="size-3.5" />
-              <span className="hidden sm:inline">Table</span>
+              <span className="hidden sm:inline">List</span>
             </button>
             <button
               onClick={() => setViewMode('kanban')}
-              className={`p-1.5 rounded-md text-xs font-mono transition-colors flex items-center gap-1.5 ${
+              className={`p-1.5 rounded-md text-xs transition-colors flex items-center gap-1.5 ${
                 viewMode === 'kanban'
                   ? 'bg-muted text-foreground font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
-              title="Kanban Board View"
+              title="Board view"
             >
               <Kanban className="size-3.5" />
-              <span className="hidden sm:inline">Kanban</span>
+              <span className="hidden sm:inline">Board</span>
             </button>
           </div>
 
@@ -173,7 +173,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
             onClick={() => setIsCreateModalOpen(true)}
             icon={<PlusCircle className="size-3.5" />}
           >
-            Request Change
+            Request a change
           </Button>
         </div>
       </div>
@@ -298,9 +298,9 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
           {filteredRequests.length === 0 ? (
             <EmptyState
               icon={<FileCode2 className="size-6 text-foreground" />}
-              title="No requests found"
-              description="You have no change requests under this filter."
-              actionLabel="Request a Change"
+              title="No requests yet"
+              description="When you need an update to your website, submit a request here."
+              actionLabel="Request a change"
               onAction={() => setIsCreateModalOpen(true)}
             />
           ) : (
@@ -368,14 +368,14 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
       <Modal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Request a Change"
-        description="Describe website updates. Staged and deployed under your Care Plan SLA."
+        title="Request a change"
+        description="Tell us what you would like updated on your website."
         maxWidth="lg"
       >
         <form onSubmit={handleCreateRequest} className="space-y-3.5">
           <Input
-            label="Request Title"
-            placeholder="e.g., Update doctor bio photos and headline"
+            label="Summary"
+            placeholder="e.g., Update team photos and opening hours"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             required
@@ -383,7 +383,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Target Website</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Website</label>
               <select
                 value={newWebsiteId}
                 onChange={(e) => setNewWebsiteId(e.target.value)}
@@ -398,20 +398,20 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Category</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Type of change</label>
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value as RequestCategory)}
                 className="w-full bg-card border border-border rounded-md px-3 py-2 text-xs text-foreground focus:outline-none focus:border-border min-h-[38px]"
               >
-                <option value="content">Content & Text Update</option>
-                <option value="new_section">New Website Section</option>
-                <option value="new_page">Add a New Page</option>
-                <option value="design">Design & Visual Tweak</option>
-                <option value="booking">Modify Booking System</option>
-                <option value="ecommerce">E-Commerce Store Change</option>
-                <option value="seo">SEO & Metadata Request</option>
-                <option value="bug">Bug Report / Fix</option>
+                <option value="content">Text or images</option>
+                <option value="new_section">New page section</option>
+                <option value="new_page">New page</option>
+                <option value="design">Design adjustment</option>
+                <option value="booking">Appointments / bookings</option>
+                <option value="ecommerce">Online store</option>
+                <option value="seo">Search visibility (SEO)</option>
+                <option value="bug">Fix an issue</option>
               </select>
             </div>
           </div>
@@ -424,7 +424,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                   type="button"
                   key={p}
                   onClick={() => setNewPriority(p)}
-                  className={`py-1.5 text-xs font-mono uppercase rounded-md border text-center transition-colors min-h-[36px] ${
+                  className={`py-1.5 text-xs capitalize rounded-md border text-center transition-colors min-h-[36px] ${
                     newPriority === p
                       ? 'bg-accent text-accent-foreground border-border font-semibold shadow-2xs'
                       : 'border-border text-muted-foreground hover:bg-accent/40 hover:text-foreground'
@@ -437,8 +437,8 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
           </div>
 
           <Textarea
-            label="Specifications"
-            placeholder="Describe changes in detail..."
+            label="Details"
+            placeholder="Describe what needs to be changed..."
             rows={4}
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
@@ -455,7 +455,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
               Cancel
             </Button>
             <Button type="submit" variant="primary" size="sm">
-              Submit Request
+              Send request
             </Button>
           </div>
         </form>
@@ -467,35 +467,35 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
           isOpen={Boolean(selectedRequest)}
           onClose={() => setSelectedRequest(null)}
           title={selectedRequest.title}
-          subtitle={`Ticket #${selectedRequest.id} · ${selectedRequest.website_name}`}
+          subtitle={selectedRequest.website_name}
           width="xl"
         >
           <div className="space-y-5">
             <div className="p-3.5 rounded-lg bg-card border border-border flex items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <div className="text-[10px] uppercase font-mono text-muted-foreground">Current Status</div>
+                <div className="text-xs text-muted-foreground">Status</div>
                 <StatusBadge status={selectedRequest.status} />
               </div>
 
               <div className="space-y-0.5 text-right">
-                <div className="text-[10px] uppercase font-mono text-muted-foreground">Priority</div>
-                <div className="text-xs font-mono uppercase font-bold text-foreground">
+                <div className="text-xs text-muted-foreground">Priority</div>
+                <div className="text-xs capitalize font-semibold text-foreground">
                   {selectedRequest.priority}
                 </div>
               </div>
 
               {isAdmin && (
                 <div className="space-y-0.5">
-                  <div className="text-[10px] uppercase font-mono text-foreground font-bold">Admin Status</div>
+                  <div className="text-xs text-muted-foreground">Update status</div>
                   <select
                     value={selectedRequest.status}
                     onChange={(e) => handleStatusChange(e.target.value as RequestStatus)}
-                    className="bg-card text-xs text-foreground border border-border rounded px-2 py-1 font-mono"
+                    className="bg-card text-xs text-foreground border border-border rounded px-2 py-1"
                   >
-                    <option value="submitted">Submitted</option>
-                    <option value="in_review">In Review</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="waiting_for_client">Waiting for Client</option>
+                    <option value="submitted">Pending</option>
+                    <option value="in_review">Under review</option>
+                    <option value="in_progress">In progress</option>
+                    <option value="waiting_for_client">Needs attention</option>
                     <option value="completed">Completed</option>
                   </select>
                 </div>
@@ -503,26 +503,26 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
             </div>
 
             <div className="space-y-1.5">
-              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider font-mono">
-                Specifications
+              <h3 className="text-xs font-medium text-muted-foreground">
+                Request details
               </h3>
               <div className="p-3.5 rounded-lg bg-card border border-border text-xs text-foreground leading-relaxed whitespace-pre-wrap font-sans">
                 {selectedRequest.description}
               </div>
-              <div className="text-[10px] text-muted-foreground font-mono">
-                Submitted on {formatDateTime(selectedRequest.created_at)}
+              <div className="text-xs text-muted-foreground">
+                Submitted {formatDateTime(selectedRequest.created_at)}
               </div>
             </div>
 
             <div className="space-y-3 pt-3.5 border-t border-border">
-              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider font-mono flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-foreground" />
-                Discussion & Staging Updates ({selectedRequest.messages.length})
+              <h3 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
+                Messages ({selectedRequest.messages.length})
               </h3>
 
               {selectedRequest.messages.length === 0 ? (
-                <div className="p-5 text-center text-xs text-muted-foreground border border-border rounded-lg font-mono">
-                  No replies yet. Staging URLs and feedback will appear here.
+                <div className="p-5 text-center text-xs text-muted-foreground border border-border rounded-lg">
+                  No messages yet.
                 </div>
               ) : (
                 <div className="space-y-2.5">
@@ -539,16 +539,16 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-foreground">{msg.sender_name}</span>
                           <span
-                            className={`px-1.5 py-0.2 text-[9px] font-mono rounded ${
+                            className={`px-1.5 py-0.5 text-[10px] rounded ${
                               msg.sender_role === 'admin'
-                                ? 'bg-primary text-primary-foreground font-bold'
+                                ? 'bg-primary text-primary-foreground font-medium'
                                 : 'bg-muted text-muted-foreground border border-border'
                             }`}
                           >
-                            {msg.sender_role === 'admin' ? 'Staff' : 'Client'}
+                            {msg.sender_role === 'admin' ? 'Support' : 'Team'}
                           </span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-mono">
+                        <span className="text-xs text-muted-foreground">
                           {formatTimeAgo(msg.created_at)}
                         </span>
                       </div>
@@ -560,7 +560,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
 
               <form onSubmit={handleSendReply} className="pt-2 space-y-2">
                 <Textarea
-                  placeholder={`Reply as ${user.full_name}...`}
+                  placeholder="Write a message..."
                   rows={2}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
@@ -573,7 +573,7 @@ export const RequestsPage: React.FC<RequestsPageProps> = ({
                     icon={<Send className="w-3.5 h-3.5" />}
                     disabled={!replyText.trim()}
                   >
-                    Send Reply
+                    Send message
                   </Button>
                 </div>
               </form>

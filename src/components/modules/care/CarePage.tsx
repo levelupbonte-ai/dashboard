@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ShieldCheck,
-  Check,
-  Zap,
-  Clock,
-  ArrowRight,
-  HelpCircle,
-} from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useTenant } from '../../../context/TenantContext';
 import { CARE_PLANS, stripeService } from '../../../services/stripeService';
 import { Button } from '../../ui/Button';
@@ -32,10 +25,10 @@ export const CarePage: React.FC = () => {
     try {
       const { checkoutUrl } = await stripeService.createCheckoutSession(currentTenant.id, tier);
       setActionNotice(
-        `Stripe Checkout initiated for LevelUp ${CARE_PLANS[tier].name} ($${CARE_PLANS[tier].priceMonthly}/mo). Checkout URL generated: ${checkoutUrl}`
+        `Checkout session created for ${CARE_PLANS[tier].name} ($${CARE_PLANS[tier].priceMonthly}/month). (${checkoutUrl})`
       );
     } catch (err: any) {
-      setActionNotice(err.message || 'Error creating checkout session');
+      setActionNotice(err.message || 'Unable to start checkout session');
     } finally {
       setUpgradingTier(null);
     }
@@ -45,9 +38,9 @@ export const CarePage: React.FC = () => {
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="pb-3 sm:pb-4 border-b border-border">
-        <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Website Care & Maintenance</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Subscription</h1>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Proactive security updates, SLA response guarantees, and change request quotas.
+          Your website plan, included updates, and backups for {currentTenant.name}
         </p>
       </div>
 
@@ -60,54 +53,59 @@ export const CarePage: React.FC = () => {
           </div>
           <button
             onClick={() => setActionNotice(null)}
-            className="text-muted-foreground hover:text-foreground text-xs font-mono shrink-0 ml-2"
+            className="text-muted-foreground hover:text-foreground text-xs shrink-0 ml-2"
           >
             ✕
           </button>
         </div>
       )}
 
-      {/* Quota & Health Box */}
+      {/* Current Plan Summary */}
       <div className="bg-card border border-border rounded-lg p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-border/80">
           <div>
-            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider font-mono">
-              Enrolled Tier
-            </div>
+            <div className="text-xs text-muted-foreground">Current plan</div>
             <div className="text-base sm:text-lg font-bold text-foreground mt-0.5">
-              LevelUp {CARE_PLANS[currentTenant.care_plan]?.name || 'Pro Care'} Plan
+              {CARE_PLANS[currentTenant.care_plan]?.name || 'Pro'} Plan
             </div>
           </div>
 
-          <div className="px-2.5 py-1 rounded bg-muted border border-border text-emerald-500 text-xs font-mono font-medium flex items-center gap-1.5 self-start sm:self-auto">
-            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            24/7 Edge Telemetry Active
+          <div className="px-2.5 py-1 rounded bg-muted border border-border text-emerald-500 text-xs font-medium flex items-center gap-1.5 self-start sm:self-auto">
+            <span className="size-1.5 rounded-full bg-emerald-500" />
+            Active
           </div>
         </div>
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <div className="p-3 sm:p-3.5 rounded-md bg-muted/40 border border-border space-y-1">
-            <div className="text-[10px] text-muted-foreground font-mono uppercase">Quota Usage</div>
-            <div className="text-xl font-bold text-foreground font-mono tabular-nums">
-              {thisMonthRequests.length} / {currentTenant.care_plan === 'essential' ? '1' : currentTenant.care_plan === 'pro' ? '4' : 'Unlimited'}
+            <div className="text-xs text-muted-foreground">Monthly updates used</div>
+            <div className="text-xl font-bold text-foreground tabular-nums">
+              {thisMonthRequests.length} /{' '}
+              {currentTenant.care_plan === 'essential'
+                ? '1'
+                : currentTenant.care_plan === 'pro'
+                ? '4'
+                : 'Unlimited'}
             </div>
-            <p className="text-[10px] text-muted-foreground font-mono">Cycle resets Nov 1, 2026</p>
+            <p className="text-xs text-muted-foreground">Resets next month</p>
           </div>
 
           <div className="p-3 sm:p-3.5 rounded-md bg-muted/40 border border-border space-y-1">
-            <div className="text-[10px] text-muted-foreground font-mono uppercase">Turnaround SLA</div>
-            <div className="text-xl font-bold text-foreground font-mono tabular-nums">
-              {currentTenant.care_plan === 'premium' ? '< 4h' : currentTenant.care_plan === 'pro' ? '< 12h' : '< 48h'}
+            <div className="text-xs text-muted-foreground">Response time</div>
+            <div className="text-xl font-bold text-foreground tabular-nums">
+              {currentTenant.care_plan === 'premium'
+                ? 'Under 4 hours'
+                : currentTenant.care_plan === 'pro'
+                ? 'Under 12 hours'
+                : 'Under 48 hours'}
             </div>
-            <p className="text-[10px] text-muted-foreground font-mono">Engineering queue priority</p>
+            <p className="text-xs text-muted-foreground">Business days</p>
           </div>
 
           <div className="p-3 sm:p-3.5 rounded-md bg-muted/40 border border-border space-y-1">
-            <div className="text-[10px] text-muted-foreground font-mono uppercase">Snapshots & Backups</div>
-            <div className="text-xl font-bold text-foreground font-mono tabular-nums">
-              30 Days
-            </div>
-            <p className="text-[10px] text-muted-foreground font-mono">Encrypted multi-region</p>
+            <div className="text-xs text-muted-foreground">Website backups</div>
+            <div className="text-xl font-bold text-foreground tabular-nums">Daily</div>
+            <p className="text-xs text-muted-foreground">30-day history</p>
           </div>
         </div>
       </div>
@@ -129,29 +127,27 @@ export const CarePage: React.FC = () => {
               }`}
             >
               {isCurrent && (
-                <div className="absolute top-3 right-3 px-2 py-0.5 rounded bg-foreground text-background text-[10px] font-mono uppercase font-bold">
-                  Enrolled
+                <div className="absolute top-3 right-3 px-2 py-0.5 rounded bg-foreground text-background text-xs font-medium">
+                  Current plan
                 </div>
               )}
 
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground font-mono">
-                  {t.recommendedFor}
-                </div>
+                <div className="text-xs text-muted-foreground">{t.recommendedFor}</div>
                 <h3 className="text-base font-bold text-foreground mt-1">{t.name}</h3>
                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed min-h-[32px]">
                   {t.description}
                 </p>
 
-                <div className="my-4 flex items-baseline gap-1 font-mono">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-foreground tabular-nums">${t.priceMonthly}</span>
+                <div className="my-4 flex items-baseline gap-1">
+                  <span className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                    ${t.priceMonthly}
+                  </span>
                   <span className="text-xs text-muted-foreground">/ month</span>
                 </div>
 
                 <div className="space-y-2 pt-3 border-t border-border/80">
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground font-mono">
-                    Service Scope
-                  </div>
+                  <div className="text-xs font-medium text-muted-foreground">Included in plan</div>
                   {t.highlights.map((h, idx) => (
                     <div key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
                       <Check className="size-3.5 text-foreground shrink-0 mt-0.5" />
@@ -164,7 +160,7 @@ export const CarePage: React.FC = () => {
               <div className="mt-6 pt-3 border-t border-border/80">
                 {isCurrent ? (
                   <Button variant="secondary" size="md" className="w-full" disabled>
-                    Current Plan
+                    Current plan
                   </Button>
                 ) : (
                   <Button
@@ -174,7 +170,7 @@ export const CarePage: React.FC = () => {
                     onClick={() => handleUpgrade(tierKey)}
                     disabled={upgradingTier === tierKey}
                   >
-                    {upgradingTier === tierKey ? 'Connecting...' : `Select ${t.name}`}
+                    {upgradingTier === tierKey ? 'Loading...' : `Switch to ${t.name}`}
                   </Button>
                 )}
               </div>

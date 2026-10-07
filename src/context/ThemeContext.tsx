@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type AppTheme = 'vercel' | 'supabase' | 'claude' | 'mono';
+export type AppTheme = 'vercel' | 'supabase' | 'claude' | 'whatsapp' | 'instagram' | 'gmail';
 export type AppMode = 'dark' | 'light';
 
 interface ThemeContextType {
@@ -18,8 +18,11 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<AppTheme>(() => {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY) as AppTheme | null;
-    return saved && ['vercel', 'supabase', 'claude', 'mono'].includes(saved) ? saved : 'vercel';
+    const saved = localStorage.getItem(THEME_STORAGE_KEY) as string | null;
+    if (saved === 'mono') return 'whatsapp';
+    return saved && ['vercel', 'supabase', 'claude', 'whatsapp', 'instagram', 'gmail'].includes(saved)
+      ? (saved as AppTheme)
+      : 'vercel';
   });
 
   const [mode, setModeState] = useState<AppMode>(() => {

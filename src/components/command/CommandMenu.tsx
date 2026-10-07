@@ -10,8 +10,10 @@ import {
   Settings,
   ArrowRight,
   TrendingUp,
+  UserCheck,
 } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
+import { useAuth } from '../../context/AuthContext';
 import { dataService } from '../../services/dataService';
 
 interface CommandMenuProps {
@@ -23,6 +25,8 @@ interface CommandMenuProps {
 export const CommandMenu: React.FC<CommandMenuProps> = ({ isOpen, onClose, onNavigate }) => {
   const [query, setQuery] = useState('');
   const { currentTenant, hasBookings, hasEcommerce, hasSeo } = useTenant();
+  const { can } = useAuth();
+  const canViewBilling = can('billing.view');
 
   const websites = useMemo(() => dataService.getWebsites(currentTenant.id), [currentTenant.id]);
   const requests = useMemo(() => dataService.getRequests(currentTenant.id), [currentTenant.id]);
@@ -46,31 +50,49 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({ isOpen, onClose, onNav
     if (!isOpen) setQuery('');
   }, [isOpen]);
 
+  const isMedical = currentTenant.slug === 'lumina-health';
+  const isHospitality = currentTenant.slug === 'velvet-vine';
+
   const staticNavigation = useMemo(() => {
     const nav = [
       { id: 'overview', title: 'Overview', icon: <TrendingUp className="size-3.5" /> },
-      { id: 'websites', title: 'My Websites', icon: <Globe className="size-3.5" /> },
-      { id: 'requests', title: 'Website Requests (Request a Change)', icon: <FileText className="size-3.5" /> },
-      { id: 'leads', title: 'Leads & Inbound Pipeline', icon: <Users className="size-3.5" /> },
+      { id: 'websites', title: 'My websites', icon: <Globe className="size-3.5" /> },
+      { id: 'requests', title: 'Open requests', icon: <FileText className="size-3.5" /> },
+      {
+        id: 'leads',
+        title: isMedical ? 'Patient enquiries' : 'New enquiries',
+        icon: <Users className="size-3.5" />,
+      },
     ];
     if (hasBookings) {
-      nav.push({ id: 'bookings', title: 'Bookings & Appointments', icon: <Calendar className="size-3.5" /> });
+      nav.push({
+        id: 'bookings',
+        title: isHospitality ? 'Reservations' : 'Appointments',
+        icon: <Calendar className="size-3.5" />,
+      });
     }
     if (hasEcommerce) {
-      nav.push({ id: 'store', title: 'Store & Orders', icon: <CreditCard className="size-3.5" /> });
+      nav.push({ id: 'store', title: 'Orders', icon: <CreditCard className="size-3.5" /> });
     }
     if (hasSeo) {
-      nav.push({ id: 'seo', title: 'Search Visibility (SEO)', icon: <Globe className="size-3.5" /> });
+      nav.push({ id: 'seo', title: 'Search visibility', icon: <Globe className="size-3.5" /> });
     }
     nav.push(
-      { id: 'analytics', title: 'Analytics & Telemetry', icon: <TrendingUp className="size-3.5" /> },
-      { id: 'billing', title: 'Billing & Plans', icon: <CreditCard className="size-3.5" /> },
-      { id: 'care', title: 'Website Care Plans', icon: <FileText className="size-3.5" /> },
-      { id: 'support', title: 'Support Desk', icon: <LifeBuoy className="size-3.5" /> },
-      { id: 'settings', title: 'Account Settings', icon: <Settings className="size-3.5" /> }
+      { id: 'analytics', title: 'Website traffic', icon: <TrendingUp className="size-3.5" /> },
+      { id: 'team', title: 'Team', icon: <UserCheck className="size-3.5" /> }
+    );
+    if (canViewBilling) {
+      nav.push(
+        { id: 'billing', title: 'Billing & invoices', icon: <CreditCard className="size-3.5" /> },
+        { id: 'care', title: 'Subscription', icon: <FileText className="size-3.5" /> }
+      );
+    }
+    nav.push(
+      { id: 'support', title: 'Support', icon: <LifeBuoy className="size-3.5" /> },
+      { id: 'settings', title: 'Settings', icon: <Settings className="size-3.5" /> }
     );
     return nav;
-  }, [hasBookings, hasEcommerce, hasSeo]);
+  }, [hasBookings, hasEcommerce, hasSeo, canViewBilling, isMedical, isHospitality]);
 
   const q = query.toLowerCase().trim();
 

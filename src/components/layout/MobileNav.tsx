@@ -19,6 +19,7 @@ import {
 import { useTenant } from '../../context/TenantContext';
 import { useAuth } from '../../context/AuthContext';
 import { OrgSwitcher } from '../shadcn/OrgSwitcher';
+import { LevelUpLogo } from '../shadcn/LevelUpLogo';
 import { ThemeSelector } from '../shadcn/ThemeSelector';
 import { ThemeModeToggle } from '../shadcn/ThemeModeToggle';
 import { cn } from '../../lib/utils';
@@ -57,7 +58,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({
       id: 'requests',
       label: 'Requests',
       icon: FileCode2,
-      badge: pendingRequestsCount > 0 ? `${pendingRequestsCount}` : undefined,
     },
     { id: 'team', label: 'Team', icon: UserCheck },
   ];
@@ -72,7 +72,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           id: 'requests',
           label: 'Open requests',
           icon: FileCode2,
-          badge: pendingRequestsCount > 0 ? `${pendingRequestsCount}` : undefined,
         },
       ],
     },
@@ -141,11 +140,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({
               )}
               <div className="relative">
                 <Icon className="size-4" />
-                {tab.badge && (
-                  <span className="absolute -top-1.5 -right-2 px-1 text-[9px] font-mono font-bold bg-primary text-primary-foreground rounded">
-                    {tab.badge}
-                  </span>
-                )}
               </div>
               <span className="text-[10px] font-medium tracking-tight mt-1 truncate">
                 {tab.label}
@@ -175,22 +169,20 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           <div className="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-card border-l border-border p-4 flex flex-col z-10 shadow-2xl animate-in slide-in-from-right duration-200">
             {/* Drawer Header */}
             <div className="flex items-center justify-between pb-3 border-b border-border/80">
-              <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-mono font-bold text-xs">
-                  {currentTenant.name.charAt(0)}
-                </div>
+              <div className="flex items-center gap-2.5">
+                <LevelUpLogo className="size-7 shrink-0" />
                 <div>
                   <div className="text-xs font-semibold text-foreground truncate max-w-[150px]">
                     {currentTenant.name}
                   </div>
-                  <div className="text-[10px] font-mono text-muted-foreground">
-                    Client Organization Workspace
+                  <div className="text-[11px] text-muted-foreground capitalize">
+                    {currentTenant.care_plan} plan
                   </div>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="size-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/60 flex items-center justify-center"
+                className="size-8 rounded-lg text-muted-foreground hover:text-foreground flex items-center justify-center"
                 aria-label="Close menu"
               >
                 <X className="size-4" />
@@ -244,11 +236,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                           />
                           <span className="truncate">{item.label}</span>
                         </div>
-                        {item.badge && (
-                          <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-primary text-primary-foreground rounded">
-                            {item.badge}
-                          </span>
-                        )}
                       </button>
                     );
                   })}

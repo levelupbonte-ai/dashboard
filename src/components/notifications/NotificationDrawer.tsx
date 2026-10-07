@@ -82,7 +82,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
               }`}
             >
               <div className="flex items-start gap-2.5">
-                <div className="p-1.5 rounded bg-muted border border-border shrink-0">
+                <div className="mt-0.5 shrink-0">
                   {getIcon(notif.category)}
                 </div>
                 <div className="flex-1 min-w-0">

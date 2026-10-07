@@ -20,36 +20,34 @@ export const ShadcnHeader: React.FC<ShadcnHeaderProps> = ({
   onToggleSidebar,
   onOpenSearch,
   onOpenNotifications,
-  unreadCount,
-  onNavigateTab,
 }) => {
   const { orgRole } = useAuth();
 
   return (
-    <header className="h-14 border-b border-border bg-background/80 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between gap-3 sticky top-0 z-30 shrink-0">
+    <header className="h-14 border-b border-border/50 bg-background/85 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-3 sticky top-0 z-30 shrink-0">
       {/* Left: Sidebar trigger + Breadcrumb Trail */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={onToggleSidebar}
-          className="size-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors flex items-center justify-center shrink-0 border border-border/40"
+          className="size-8 rounded-md text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center shrink-0"
           title="Toggle Sidebar"
           aria-label="Toggle Sidebar"
         >
           <PanelLeft className="size-4" />
         </button>
 
-        <div className="h-4 w-px bg-border/80 hidden sm:block" />
+        <div className="h-4 w-px bg-border/50 hidden sm:block" />
 
         <Breadcrumbs activeTab={activeTab} />
       </div>
 
-      {/* Right: Search, Role Badge, Notification, Theme, Mode */}
+      {/* Right: Search, Role, Theme, Mode, Notifications */}
       <div className="flex items-center gap-2 shrink-0">
         <SearchInput onClick={onOpenSearch} />
 
-        {/* Organization Role Badge (Desktop only) */}
-        <div className="hidden lg:flex items-center px-2.5 py-1 rounded-md bg-muted/60 border border-border/80 text-[10px] font-mono text-muted-foreground">
-          <span className="uppercase font-semibold tracking-wider text-foreground">{orgRole}</span>
+        {/* Organization Role (Desktop only) */}
+        <div className="hidden lg:flex items-center px-2 py-1 text-xs text-muted-foreground">
+          <span className="uppercase font-medium tracking-wider text-foreground">{orgRole}</span>
         </div>
 
         <ThemeModeToggle />
@@ -58,17 +56,14 @@ export const ShadcnHeader: React.FC<ShadcnHeaderProps> = ({
           <ThemeSelector />
         </div>
 
-        {/* Notifications Button */}
+        {/* Notifications Button (clean icon, no bubble) */}
         <button
           onClick={onOpenNotifications}
-          className="relative size-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors flex items-center justify-center border border-border/40 bg-card"
+          className="size-8 rounded-md text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
           aria-label="Notifications"
           title="Notifications"
         >
-          <Bell className="size-3.5" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-primary ring-2 ring-background" />
-          )}
+          <Bell className="size-4" />
         </button>
       </div>
     </header>

@@ -64,7 +64,6 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
           id: 'requests',
           title: 'Open requests',
           icon: FileCode2,
-          badge: pendingRequestsCount > 0 ? `${pendingRequestsCount}` : undefined,
         },
       ],
     },
@@ -111,21 +110,21 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
   return (
     <aside
       className={cn(
-        'hidden md:flex h-screen bg-card/60 border-r border-border flex-col transition-all duration-200 z-40 select-none shrink-0 sticky top-0',
-        isCollapsed ? 'w-[68px]' : 'w-64'
+        'hidden md:flex h-screen bg-card/40 border-r border-border/50 flex-col transition-all duration-200 z-40 select-none shrink-0 sticky top-0',
+        isCollapsed ? 'w-[68px]' : 'w-60'
       )}
     >
       {/* 1. Sidebar Header: Organization Switcher (OrgSwitcher) */}
-      <div className="p-3 border-b border-border/80">
+      <div className="px-3 py-2.5 border-b border-border/40">
         <OrgSwitcher isCollapsed={isCollapsed} />
       </div>
 
       {/* 2. Sidebar Navigation Items */}
-      <div className="flex-1 overflow-y-auto px-2.5 py-3 space-y-4 scrollbar-none">
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5 scrollbar-none">
         {navGroups.map((group, gIdx) => (
-          <div key={gIdx} className="space-y-0.5">
+          <div key={gIdx} className="space-y-1">
             {!isCollapsed && (
-              <div className="px-2.5 py-1 text-[10px] font-mono font-medium uppercase tracking-wider text-muted-foreground">
+              <div className="px-2.5 pb-1 text-[11px] font-medium text-muted-foreground/80">
                 {group.label}
               </div>
             )}
@@ -139,10 +138,10 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
                     key={item.id}
                     onClick={() => onSelectTab(item.id)}
                     className={cn(
-                      'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors text-left relative group',
+                      'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] leading-none transition-colors text-left relative group',
                       isActive
-                        ? 'bg-accent text-accent-foreground font-semibold shadow-2xs'
-                        : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+                        ? 'bg-accent/80 text-accent-foreground font-medium'
+                        : 'text-muted-foreground hover:bg-accent/40 hover:text-foreground font-normal',
                       isCollapsed && 'justify-center px-1.5'
                     )}
                     title={isCollapsed ? item.title : undefined}
@@ -157,24 +156,13 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
                     />
 
                     {!isCollapsed && (
-                      <span className="truncate flex-1 tracking-tight">{item.title}</span>
-                    )}
-
-                    {!isCollapsed && item.badge && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-md bg-foreground text-background shrink-0">
-                        {item.badge}
-                      </span>
+                      <span className="truncate flex-1">{item.title}</span>
                     )}
 
                     {/* Tooltip on collapsed mode */}
                     {isCollapsed && (
-                      <div className="fixed left-[72px] ml-1 hidden group-hover:flex items-center px-2 py-1 rounded bg-popover text-popover-foreground text-xs font-medium shadow-md border border-border z-50 pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95 duration-100">
+                      <div className="fixed left-[72px] ml-1 hidden group-hover:flex items-center px-2.5 py-1.5 rounded-md bg-popover text-popover-foreground text-xs font-medium shadow-md border border-border/60 z-50 pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95 duration-100">
                         {item.title}
-                        {item.badge && (
-                          <span className="ml-1.5 px-1 py-0.2 text-[9px] font-mono bg-muted rounded">
-                            {item.badge}
-                          </span>
-                        )}
                       </div>
                     )}
                   </button>
@@ -186,7 +174,7 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
       </div>
 
       {/* 3. Collapse Toggle Button & User Profile Footer (NavUser) */}
-      <div className="p-2 border-t border-border/80 space-y-1 bg-card/40">
+      <div className="p-2.5 border-t border-border/40 space-y-1">
         <NavUser
           isCollapsed={isCollapsed}
           onNavigateTab={onSelectTab}
@@ -197,7 +185,7 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
         <button
           onClick={onToggleCollapse}
           className={cn(
-            'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors border border-transparent hover:border-border/60',
+            'w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors',
             isCollapsed && 'justify-center'
           )}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -208,7 +196,7 @@ export const ShadcnSidebar: React.FC<ShadcnSidebarProps> = ({
           ) : (
             <>
               <ChevronLeft className="size-3.5" />
-              <span className="text-[11px] font-mono">Collapse Sidebar</span>
+              <span className="text-xs">Collapse sidebar</span>
             </>
           )}
         </button>

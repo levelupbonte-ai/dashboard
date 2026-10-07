@@ -211,9 +211,7 @@ export const SettingsPage: React.FC = () => {
           className="max-w-xl space-y-3.5 bg-card border border-border rounded-lg p-4 sm:p-5 shadow-xs"
         >
           <div className="flex items-center gap-3 pb-3 border-b border-border">
-            <div className="size-10 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-foreground text-base font-bold font-mono">
-              {fullName.charAt(0)}
-            </div>
+            <User className="size-5 text-muted-foreground shrink-0" />
             <div>
               <h2 className="text-sm font-semibold text-foreground">{fullName}</h2>
               <p className="text-xs text-muted-foreground font-mono">{email}</p>

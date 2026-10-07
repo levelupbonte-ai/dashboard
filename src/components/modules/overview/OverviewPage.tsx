@@ -276,23 +276,14 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               <CardContent>
                 <div className="space-y-4">
                   {recentLeads.map((lead) => {
-                    const initials = lead.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2);
-
                     return (
                       <div
                         key={lead.id}
                         onClick={() => onNavigateTab('leads')}
                         className="flex items-center justify-between gap-3 p-1.5 rounded-md hover:bg-accent/40 transition-colors cursor-pointer"
                       >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="size-9 rounded-full bg-muted border border-border flex items-center justify-center font-semibold text-xs text-foreground shrink-0">
-                            {initials}
-                          </div>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Users2 className="size-4 text-muted-foreground shrink-0" />
                           <div className="space-y-0.5 min-w-0">
                             <p className="text-xs font-medium text-foreground truncate leading-none">
                               {lead.name}

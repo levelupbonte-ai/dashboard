@@ -30,15 +30,6 @@ export const NavUser: React.FC<NavUserProps> = ({
 
   const canViewBilling = can('billing.view');
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((part) => part[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
-  };
-
   return (
     <div className="relative">
       <button
@@ -50,17 +41,15 @@ export const NavUser: React.FC<NavUserProps> = ({
         title={`${user.full_name} (${ROLE_LABELS[orgRole]})`}
         aria-label="User account menu"
       >
-        <div className="size-8 rounded-lg bg-secondary text-secondary-foreground flex items-center justify-center font-mono font-semibold text-xs shrink-0 border border-border">
-          {getInitials(user.full_name)}
-        </div>
+        <User className="size-4 text-muted-foreground shrink-0" />
 
         {!isCollapsed && (
           <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
             <span className="truncate font-semibold text-foreground text-xs">
               {user.full_name}
             </span>
-            <span className="truncate text-[10px] text-muted-foreground font-mono">
-              {ROLE_LABELS[orgRole]} · {user.email}
+            <span className="truncate text-[11px] text-muted-foreground">
+              {ROLE_LABELS[orgRole]}
             </span>
           </div>
         )}
@@ -82,14 +71,12 @@ export const NavUser: React.FC<NavUserProps> = ({
             {/* User Identity Header */}
             <div className="px-2 py-2 border-b border-border/80 mb-1">
               <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg bg-secondary text-secondary-foreground flex items-center justify-center font-mono font-semibold text-xs shrink-0 border border-border">
-                  {getInitials(user.full_name)}
-                </div>
+                <User className="size-4 text-muted-foreground shrink-0" />
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-semibold text-foreground truncate">
                     {user.full_name}
                   </div>
-                  <div className="text-[10px] text-muted-foreground font-mono truncate">
+                  <div className="text-[11px] text-muted-foreground truncate">
                     {user.email}
                   </div>
                 </div>

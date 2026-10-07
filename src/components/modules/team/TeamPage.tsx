@@ -307,12 +307,6 @@ export const TeamPage: React.FC = () => {
         <div className="space-y-4">
           <div className="bg-card border border-border rounded-lg overflow-hidden shadow-xs divide-y divide-border/70">
             {members.map((member) => {
-              const initials = member.full_name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .slice(0, 2)
-                .toUpperCase();
               const isLastOwner =
                 member.org_role === 'OWNER' &&
                 members.filter((m) => m.org_role === 'OWNER').length <= 1;
@@ -323,9 +317,7 @@ export const TeamPage: React.FC = () => {
                   className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-accent/30 transition-colors"
                 >
                   <div className="flex items-start sm:items-center gap-3 min-w-0">
-                    <div className="size-10 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center font-mono font-bold text-xs shrink-0">
-                      {initials}
-                    </div>
+                    <Users2 className="size-4 text-muted-foreground shrink-0" />
                     <div className="min-w-0 space-y-0.5">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-semibold text-foreground">

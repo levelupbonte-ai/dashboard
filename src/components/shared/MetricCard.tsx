@@ -28,8 +28,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     <div
       onClick={onClick}
       className={cn(
-        'bg-card border border-border rounded-lg p-4 transition-all duration-150 shadow-xs',
-        onClick && 'cursor-pointer hover:border-border/80 hover:bg-accent/40',
+        'bg-card border border-border/60 rounded-xl p-5 transition-all duration-150 shadow-2xs',
+        onClick && 'cursor-pointer hover:border-border hover:bg-accent/30',
         className
       )}
     >
@@ -44,12 +44,12 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         )}
       </div>
 
-      <div className="mt-2 flex items-baseline justify-between gap-2">
-        <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
+      <div className="mt-2.5 flex items-baseline justify-between gap-2">
+        <div className="text-2xl font-semibold tracking-tight text-foreground tabular-nums">
           {value}
         </div>
         {badge && (
-          <span className="px-2 py-0.5 text-[11px] font-medium bg-muted text-foreground border border-border rounded">
+          <span className="px-2 py-0.5 text-[11px] font-medium bg-muted text-foreground border border-border/60 rounded">
             {badge}
           </span>
         )}

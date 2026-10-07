@@ -12,6 +12,7 @@ import { ShadcnHeader } from './components/layout/ShadcnHeader';
 import { MobileNav } from './components/layout/MobileNav';
 import { CommandMenu } from './components/command/CommandMenu';
 import { NotificationDrawer } from './components/notifications/NotificationDrawer';
+import { DatabaseLoadingSkeleton } from './components/shared/DatabaseLoadingSkeleton';
 import { OverviewPage } from './components/modules/overview/OverviewPage';
 import { WebsitesPage } from './components/modules/websites/WebsitesPage';
 import { RequestsPage } from './components/modules/requests/RequestsPage';
@@ -29,7 +30,14 @@ import { dataService } from './services/dataService';
 import { Website } from './types';
 
 const DashboardContent: React.FC = () => {
-  const { currentTenant, hasBookings, hasEcommerce, hasSeo } = useTenant();
+  const {
+    currentTenant,
+    hasBookings,
+    hasEcommerce,
+    hasSeo,
+    isLoadingData,
+    triggerDatabaseLoad,
+  } = useTenant();
   const { can } = useAuth();
   const canViewBilling = can('billing.view');
 
@@ -43,7 +51,6 @@ const DashboardContent: React.FC = () => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState<boolean>(false);
   const [preselectedSite, setPreselectedSite] = useState<Website | null>(null);
 
-  // Dynamic notifications & badge counts (Respecting billing visibility privacy)
   const notifications = dataService
     .getNotifications(currentTenant.id)
     .filter((n) => (n.category === 'billing' ? canViewBilling : true));
@@ -51,7 +58,6 @@ const DashboardContent: React.FC = () => {
   const requests = dataService.getRequests(currentTenant.id);
   const pendingRequestsCount = requests.filter((r) => r.status !== 'completed').length;
 
-  // Ensure activeTab is valid when switching tenants or organization roles
   useEffect(() => {
     if (activeTab === 'bookings' && !hasBookings) {
       setActiveTab('overview');
@@ -67,6 +73,13 @@ const DashboardContent: React.FC = () => {
     }
   }, [currentTenant.id, hasBookings, hasEcommerce, hasSeo, canViewBilling, activeTab]);
 
+  const handleNavigateTab = (tabId: string) => {
+    if (tabId !== activeTab) {
+      triggerDatabaseLoad(420);
+      setActiveTab(tabId);
+    }
+  };
+
   const handleRequestChange = (site?: Website) => {
     if (site) {
       setPreselectedSite(site);
@@ -78,11 +91,15 @@ const DashboardContent: React.FC = () => {
   };
 
   const renderActiveModule = () => {
+    if (isLoadingData) {
+      return <DatabaseLoadingSkeleton />;
+    }
+
     switch (activeTab) {
       case 'overview':
         return (
           <OverviewPage
-            onNavigateTab={(tab) => setActiveTab(tab)}
+            onNavigateTab={handleNavigateTab}
             onRequestChange={() => handleRequestChange()}
           />
         );
@@ -90,7 +107,7 @@ const DashboardContent: React.FC = () => {
       case 'performance':
         return (
           <WebsitesPage
-            onNavigateTab={(tab) => setActiveTab(tab)}
+            onNavigateTab={handleNavigateTab}
             onRequestChangeForSite={(site) => handleRequestChange(site)}
           />
         );
@@ -108,13 +125,13 @@ const DashboardContent: React.FC = () => {
         return hasBookings ? (
           <BookingsPage />
         ) : (
-          <OverviewPage onNavigateTab={setActiveTab} onRequestChange={handleRequestChange} />
+          <OverviewPage onNavigateTab={handleNavigateTab} onRequestChange={handleRequestChange} />
         );
       case 'store':
         return hasEcommerce ? (
           <StorePage />
         ) : (
-          <OverviewPage onNavigateTab={setActiveTab} onRequestChange={handleRequestChange} />
+          <OverviewPage onNavigateTab={handleNavigateTab} onRequestChange={handleRequestChange} />
         );
       case 'analytics':
       case 'traffic':
@@ -123,15 +140,15 @@ const DashboardContent: React.FC = () => {
         return hasSeo ? (
           <SeoPage />
         ) : (
-          <OverviewPage onNavigateTab={setActiveTab} onRequestChange={handleRequestChange} />
+          <OverviewPage onNavigateTab={handleNavigateTab} onRequestChange={handleRequestChange} />
         );
       case 'billing':
-        return <BillingPage onNavigateTab={(tab) => setActiveTab(tab)} />;
+        return <BillingPage onNavigateTab={handleNavigateTab} />;
       case 'care':
         return canViewBilling ? (
           <CarePage />
         ) : (
-          <OverviewPage onNavigateTab={setActiveTab} onRequestChange={handleRequestChange} />
+          <OverviewPage onNavigateTab={handleNavigateTab} onRequestChange={handleRequestChange} />
         );
       case 'team':
         return <TeamPage />;
@@ -142,7 +159,7 @@ const DashboardContent: React.FC = () => {
       default:
         return (
           <OverviewPage
-            onNavigateTab={(tab) => setActiveTab(tab)}
+            onNavigateTab={handleNavigateTab}
             onRequestChange={() => handleRequestChange()}
           />
         );
@@ -152,10 +169,10 @@ const DashboardContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-primary/20 selection:text-foreground">
       <div className="flex flex-1">
-        {/* Kiranism / shadcn Sidebar */}
+        {/* Sidebar */}
         <ShadcnSidebar
           activeTab={activeTab}
-          onSelectTab={(tab) => setActiveTab(tab)}
+          onSelectTab={handleNavigateTab}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           pendingRequestsCount={pendingRequestsCount}
@@ -176,10 +193,10 @@ const DashboardContent: React.FC = () => {
             onOpenSearch={() => setIsSearchOpen(true)}
             onOpenNotifications={() => setIsNotificationsOpen(true)}
             unreadCount={unreadCount}
-            onNavigateTab={(tab) => setActiveTab(tab)}
+            onNavigateTab={handleNavigateTab}
           />
 
-          <main className="flex-1 p-3 sm:p-5 lg:p-7 max-w-7xl w-full mx-auto animate-in fade-in-50 duration-150">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto animate-in fade-in-50 duration-150">
             {renderActiveModule()}
           </main>
         </div>
@@ -188,18 +205,18 @@ const DashboardContent: React.FC = () => {
       {/* Mobile Responsive Navigation & Drawer */}
       <MobileNav
         activeTab={activeTab}
-        onSelectTab={(tab) => setActiveTab(tab)}
+        onSelectTab={handleNavigateTab}
         pendingRequestsCount={pendingRequestsCount}
         isOpen={isMobileDrawerOpen}
         onOpen={() => setIsMobileDrawerOpen(true)}
         onClose={() => setIsMobileDrawerOpen(false)}
       />
 
-      {/* Global ⌘K Command Palette */}
+      {/* Global Search Command Palette */}
       <CommandMenu
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        onNavigate={(tab) => setActiveTab(tab)}
+        onNavigate={handleNavigateTab}
       />
 
       {/* Notification Slide-Over Drawer */}
@@ -209,7 +226,7 @@ const DashboardContent: React.FC = () => {
         notifications={notifications}
         onMarkRead={(id) => dataService.markNotificationRead(currentTenant.id, id)}
         onMarkAllRead={() => dataService.markAllNotificationsRead(currentTenant.id)}
-        onNavigateTab={(tab) => setActiveTab(tab)}
+        onNavigateTab={handleNavigateTab}
       />
     </div>
   );

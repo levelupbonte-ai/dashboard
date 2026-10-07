@@ -10,6 +10,8 @@ interface TenantContextType {
   activeWebsite: Website | null;
   setActiveWebsite: (website: Website) => void;
   refreshTenantData: () => void;
+  isLoadingData: boolean;
+  triggerDatabaseLoad: (durationMs?: number) => void;
   // Dynamic feature gates based on tenant services purchased
   hasBookings: boolean;
   hasEcommerce: boolean;
@@ -24,12 +26,21 @@ export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentTenantId, setCurrentTenantId] = useState<string>('tenant-lumina-01');
   const [websites, setWebsites] = useState<Website[]>([]);
   const [activeWebsite, setActiveWebsite] = useState<Website | null>(null);
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
 
   const currentTenant = useMemo(() => {
     return tenants.find((t) => t.id === currentTenantId) || tenants[0];
   }, [tenants, currentTenantId]);
 
+  const triggerDatabaseLoad = (durationMs = 550) => {
+    setIsLoadingData(true);
+    window.setTimeout(() => {
+      setIsLoadingData(false);
+    }, durationMs);
+  };
+
   const refreshTenantData = () => {
+    triggerDatabaseLoad(500);
     const all = dataService.getAllTenants();
     setTenants(all);
     const siteList = dataService.getWebsites(currentTenantId);
@@ -42,6 +53,7 @@ export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   useEffect(() => {
+    setIsLoadingData(true);
     const siteList = dataService.getWebsites(currentTenantId);
     setWebsites(siteList);
     if (siteList.length > 0) {
@@ -49,9 +61,17 @@ export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } else {
       setActiveWebsite(null);
     }
+    const timer = window.setTimeout(() => {
+      setIsLoadingData(false);
+    }, 600);
+    return () => window.clearTimeout(timer);
   }, [currentTenantId]);
 
   const switchTenant = (tenantId: string) => {
+    if (tenantId === currentTenantId) {
+      triggerDatabaseLoad(450);
+      return;
+    }
     setCurrentTenantId(tenantId);
   };
 
@@ -69,6 +89,8 @@ export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       activeWebsite,
       setActiveWebsite,
       refreshTenantData,
+      isLoadingData,
+      triggerDatabaseLoad,
       hasBookings,
       hasEcommerce,
       hasSeo,
@@ -79,6 +101,7 @@ export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       tenants,
       websites,
       activeWebsite,
+      isLoadingData,
       hasBookings,
       hasEcommerce,
       hasSeo,
